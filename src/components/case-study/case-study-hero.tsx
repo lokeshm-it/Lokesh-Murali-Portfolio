@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import {
   Gauge,
   Layers,
@@ -36,13 +37,13 @@ export function CaseStudyHero({ study }: { study: CaseStudy }) {
       </div>
 
       <div className="container pb-14 pt-28 sm:pt-32">
-        <a
+        <Link
           href="/#projects"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           All projects
-        </a>
+        </Link>
 
         <div className="mt-6 flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
