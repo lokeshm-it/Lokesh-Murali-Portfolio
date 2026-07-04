@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutral surfaces — light */
+    --background: 210 40% 99%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 20% 40%;
+
+    /* Microsoft Blue */
+    --primary: 206 100% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Cyan */
+    --secondary: 187 100% 38%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Azure accent */
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --azure: 199 89% 48%;
+    --brand-cyan: 187 100% 42%;
+
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --ring: 206 100% 42%;
+
+    --radius: 0.9rem;
+  }
+
+  .dark {
+    /* Neutral surfaces — dark (Azure Portal inspired) */
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 40% 9%;
+    --card-foreground: 210 40% 98%;
+
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --primary: 206 100% 55%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 187 92% 45%;
+    --secondary-foreground: 222 47% 6%;
+
+    --accent: 199 89% 55%;
+    --accent-foreground: 222 47% 6%;
+
+    --azure: 199 90% 58%;
+    --brand-cyan: 187 92% 50%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 206 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+  /* Consistent, visible keyboard focus across all interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background rounded-md;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-border/60;
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.35) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.35) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  }
+
+  .mask-fade-x {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+  border: 3px solid hsl(var(--background));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
