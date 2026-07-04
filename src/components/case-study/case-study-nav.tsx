@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/lib/site";
@@ -26,7 +27,7 @@ export function CaseStudyNav() {
             scrolled ? "glass shadow-lg shadow-black/5" : "border border-transparent"
           )}
         >
-          <a href="/" className="group flex items-center gap-2.5">
+          <Link href="/" className="group flex items-center gap-2.5">
             <span className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-md shadow-primary/30">
               <ShieldCheck className="size-5" />
             </span>
@@ -38,16 +39,16 @@ export function CaseStudyNav() {
                 Enterprise Case Study
               </span>
             </span>
-          </a>
+          </Link>
 
           <div className="flex items-center gap-2">
-            <a
+            <Link
               href="/#projects"
               className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <ArrowLeft className="size-4" />
               <span className="hidden sm:inline">All projects</span>
-            </a>
+            </Link>
             <ThemeToggle />
           </div>
         </nav>
