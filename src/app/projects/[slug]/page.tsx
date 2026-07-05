@@ -248,7 +248,10 @@ export default async function ProjectCaseStudyPage({
                 eyebrow="Design"
                 title="Architecture"
               >
-                <ArchitectureDiagram caption={study.architectureCaption} />
+                <ArchitectureDiagram
+                caption={study.architectureCaption}
+                image={study.architectureImage}
+              />
               </CaseStudySection>
 
               <CaseStudySection
