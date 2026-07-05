@@ -5,9 +5,16 @@ import { ZoomIn, ZoomOut, Maximize2, Network } from "lucide-react";
 
 /**
  * Responsive architecture diagram frame with zoom controls.
- * Renders a placeholder now; drop in an <img>/SVG later without layout change.
+ * Renders a real diagram image when `image` is provided; otherwise falls
+ * back to the placeholder frame for projects without a diagram graphic yet.
  */
-export function ArchitectureDiagram({ caption }: { caption: string }) {
+export function ArchitectureDiagram({
+  caption,
+  image,
+}: {
+  caption: string;
+  image?: string;
+}) {
   const [zoom, setZoom] = React.useState(1);
 
   const clamp = (z: number) => Math.min(2, Math.max(0.6, Number(z.toFixed(2))));
@@ -51,19 +58,28 @@ export function ArchitectureDiagram({ caption }: { caption: string }) {
       </div>
 
       <div className="relative aspect-[16/9] overflow-auto bg-gradient-to-br from-primary/5 via-transparent to-accent/5">
-        <div className="grid-bg absolute inset-0 opacity-40" />
+        {!image ? <div className="grid-bg absolute inset-0 opacity-40" /> : null}
         <div
           className="grid h-full w-full place-items-center transition-transform duration-200"
           style={{ transform: `scale(${zoom})` }}
         >
-          <div className="flex flex-col items-center gap-3 text-center">
-            <span className="grid size-16 place-items-center rounded-2xl border border-border bg-card/70 text-primary backdrop-blur">
-              <Network className="size-7" />
-            </span>
-            <p className="text-sm font-medium text-muted-foreground">
-              Architecture diagram placeholder
-            </p>
-          </div>
+          {image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={image}
+              alt="Architecture diagram"
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-center">
+              <span className="grid size-16 place-items-center rounded-2xl border border-border bg-card/70 text-primary backdrop-blur">
+                <Network className="size-7" />
+              </span>
+              <p className="text-sm font-medium text-muted-foreground">
+                Architecture diagram placeholder
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

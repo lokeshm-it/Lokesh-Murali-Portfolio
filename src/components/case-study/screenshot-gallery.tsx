@@ -5,6 +5,49 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ImageIcon, X, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScreenshotPlaceholder } from "@/lib/case-studies";
 
+/** A single gallery tile — shared between the grouped and flat layouts. */
+function ScreenshotTile({
+  shot,
+  onClick,
+}: {
+  shot: ScreenshotPlaceholder;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <span className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-transparent to-accent/10">
+        {shot.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={shot.image}
+            alt={shot.title}
+            loading="lazy"
+            className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <>
+            <span className="grid-bg absolute inset-0 opacity-30" />
+            <ImageIcon className="size-8 text-primary/40 transition-transform duration-300 group-hover:scale-110" />
+            <span className="absolute bottom-2 right-2 rounded-full bg-background/70 px-2 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur">
+              Placeholder
+            </span>
+          </>
+        )}
+      </span>
+      <span className="flex flex-col gap-1 p-4">
+        <span className="text-sm font-semibold">{shot.title}</span>
+        <span className="text-xs leading-relaxed text-muted-foreground">
+          {shot.caption}
+        </span>
+      </span>
+    </button>
+  );
+}
+
 /** Professional screenshot gallery with an accessible lightbox. */
 export function ScreenshotGallery({
   screenshots,
@@ -78,44 +121,52 @@ export function ScreenshotGallery({
     };
   }, [isOpen, close, go]);
 
+  // Group screenshots by implementation phase when phase metadata is present,
+  // while keeping a single flat index shared with the lightbox for prev/next.
+  const hasPhases = screenshots.some((s) => s.phase);
+  const groups = React.useMemo(() => {
+    if (!hasPhases) return [];
+    const order: string[] = [];
+    const map = new Map<string, { shot: ScreenshotPlaceholder; index: number }[]>();
+    screenshots.forEach((shot, index) => {
+      const key = shot.phase ?? "Additional Screenshots";
+      if (!map.has(key)) {
+        map.set(key, []);
+        order.push(key);
+      }
+      map.get(key)!.push({ shot, index });
+    });
+    return order.map((phase) => ({ phase, items: map.get(phase)! }));
+  }, [screenshots, hasPhases]);
+
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {screenshots.map((shot, i) => (
-          <button
-            key={shot.title}
-            type="button"
-            onClick={() => setActive(i)}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <span className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-transparent to-accent/10">
-              {shot.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={shot.image}
-                  alt={shot.title}
-                  loading="lazy"
-                  className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                />
-              ) : (
-                <>
-                  <span className="grid-bg absolute inset-0 opacity-30" />
-                  <ImageIcon className="size-8 text-primary/40 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="absolute bottom-2 right-2 rounded-full bg-background/70 px-2 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur">
-                    Placeholder
-                  </span>
-                </>
-              )}
-            </span>
-            <span className="flex flex-col gap-1 p-4">
-              <span className="text-sm font-semibold">{shot.title}</span>
-              <span className="text-xs leading-relaxed text-muted-foreground">
-                {shot.caption}
-              </span>
-            </span>
-          </button>
-        ))}
-      </div>
+      {hasPhases ? (
+        <div className="space-y-8">
+          {groups.map((group) => (
+            <div key={group.phase}>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-primary">
+                {group.phase}
+              </h3>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {group.items.map(({ shot, index }) => (
+                  <ScreenshotTile
+                    key={shot.title}
+                    shot={shot}
+                    onClick={() => setActive(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {screenshots.map((shot, i) => (
+            <ScreenshotTile key={shot.title} shot={shot} onClick={() => setActive(i)} />
+          ))}
+        </div>
+      )}
 
       {/* Lightbox */}
       <AnimatePresence>
