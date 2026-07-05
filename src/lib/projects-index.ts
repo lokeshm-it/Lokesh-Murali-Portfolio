@@ -5,13 +5,15 @@
  * augments each project with dashboard-facing metadata (categories, status,
  * normalized technologies, environments). Adding a project to `caseStudies`
  * plus one entry here surfaces it in the dashboard automatically — the UI is
- * fully data-driven and scales to 100+ projects with no redesign.
+ * fully data-driven and scales to 100+ projects with no redesign. If a new
+ * project is added without an augmentation entry it still renders correctly
+ * using the sensible defaults in `toIndexItem` below.
  */
 
 import { caseStudies, type CaseStudy } from "@/lib/case-studies";
 
 /* ------------------------------------------------------------------ */
-/* Filter dimensions (single source of truth for the UI)              */
+/* Filter dimensions (single source of truth for the UI) */
 /* ------------------------------------------------------------------ */
 
 export const TECHNOLOGY_FILTERS = [
@@ -72,7 +74,7 @@ export type Certification = (typeof CERTIFICATION_FILTERS)[number];
 export type Status = (typeof STATUS_FILTERS)[number];
 
 /* ------------------------------------------------------------------ */
-/* Per-project augmentation (keyed by case-study slug)                */
+/* Per-project augmentation (keyed by case-study slug) */
 /* ------------------------------------------------------------------ */
 
 interface Augmentation {
@@ -90,6 +92,46 @@ const augmentations: Record<string, Augmentation> = {
     technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Teams", "Purview", "PowerShell"],
     environments: ["Production", "Hybrid"],
     certifications: ["SC-400", "MS-102", "SC-100"],
+    difficulty: "Advanced",
+    status: "Completed",
+  },
+  "purview-information-protection": {
+    categories: ["Compliance", "Governance"],
+    technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Teams", "Purview", "PowerShell"],
+    environments: ["Production"],
+    certifications: ["SC-400", "MS-102"],
+    difficulty: "Advanced",
+    status: "Completed",
+  },
+  "purview-records-management": {
+    categories: ["Compliance", "Governance"],
+    technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Purview", "PowerShell"],
+    environments: ["Production"],
+    certifications: ["MS-102", "SC-400"],
+    difficulty: "Advanced",
+    status: "Completed",
+  },
+  "purview-audit": {
+    categories: ["Compliance"],
+    technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Teams", "Purview", "PowerShell"],
+    environments: ["Production"],
+    certifications: ["MS-102"],
+    difficulty: "Intermediate",
+    status: "Completed",
+  },
+  "purview-ediscovery": {
+    categories: ["Compliance"],
+    technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Teams", "Purview", "PowerShell"],
+    environments: ["Production"],
+    certifications: ["MS-102", "SC-400"],
+    difficulty: "Intermediate",
+    status: "Completed",
+  },
+  "purview-dlm": {
+    categories: ["Compliance", "Governance"],
+    technologies: ["Microsoft 365", "Exchange Online", "SharePoint", "Teams", "Purview", "PowerShell"],
+    environments: ["Production"],
+    certifications: ["MS-102"],
     difficulty: "Advanced",
     status: "Completed",
   },
@@ -128,7 +170,7 @@ const augmentations: Record<string, Augmentation> = {
 };
 
 /* ------------------------------------------------------------------ */
-/* Index model                                                        */
+/* Index model */
 /* ------------------------------------------------------------------ */
 
 export interface ProjectIndexItem {
@@ -205,7 +247,7 @@ function toIndexItem(study: CaseStudy): ProjectIndexItem {
 export const projectsIndex: ProjectIndexItem[] = caseStudies.map(toIndexItem);
 
 /* ------------------------------------------------------------------ */
-/* Filtering + search                                                 */
+/* Filtering + search */
 /* ------------------------------------------------------------------ */
 
 export interface ActiveFilters {
@@ -261,7 +303,7 @@ export function countActiveFilters(filters: ActiveFilters): number {
 }
 
 /* ------------------------------------------------------------------ */
-/* Dashboard statistics                                               */
+/* Dashboard statistics */
 /* ------------------------------------------------------------------ */
 
 export interface DashboardStats {

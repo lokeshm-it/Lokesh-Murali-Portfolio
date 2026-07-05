@@ -20,9 +20,10 @@ import {
   TerminalSquare,
   ScrollText,
 } from "lucide-react";
+import { caseStudies } from "./case-studies";
 
 /* ------------------------------------------------------------------ */
-/* Metrics — six-metric dashboard                                     */
+/* Metrics — six-metric dashboard */
 /* ------------------------------------------------------------------ */
 
 export interface Metric {
@@ -68,7 +69,7 @@ export const metrics: Metric[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* About — focus areas                                                */
+/* About — focus areas */
 /* ------------------------------------------------------------------ */
 
 export interface FocusArea {
@@ -117,7 +118,7 @@ export const focusAreas: FocusArea[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Skills                                                             */
+/* Skills */
 /* ------------------------------------------------------------------ */
 
 export interface SkillCategory {
@@ -221,7 +222,7 @@ export const skillCategories: SkillCategory[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Experience                                                         */
+/* Experience */
 /* ------------------------------------------------------------------ */
 
 export interface ExperienceItem {
@@ -324,7 +325,7 @@ export const experience: ExperienceItem[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Featured Projects                                                  */
+/* Featured Projects */
 /* ------------------------------------------------------------------ */
 
 export type Deployment = "Production" | "Home Lab";
@@ -349,92 +350,31 @@ export interface Project {
   repo: string;
 }
 
-export const projects: Project[] = [
-  {
-    slug: "purview-dlp",
-    title: "Microsoft Purview Data Loss Prevention",
-    category: "Compliance · Data Governance",
-    hero: true,
-    summary:
-      "Designed and rolled out an enterprise DLP framework across Exchange, SharePoint, OneDrive and Teams to classify and protect sensitive life-sciences data.",
-    outcome:
-      "Reduced sensitive-data exposure through policy-driven classification, alerting and automated enforcement mapped to ISO 27001 controls.",
-    tech: ["Microsoft Purview", "DLP Policies", "Sensitivity Labels", "Exchange Online", "ISO 27001"],
-    difficulty: "Advanced",
-    environment: "Microsoft 365 / Purview",
-    deployment: "Production",
-    certs: ["SC-400", "SC-900", "ISO 27001"],
-    href: "https://github.com/lokeshm-it",
-    repo: "https://github.com/lokeshm-it",
-  },
-  {
-    slug: "intune-deployment",
-    title: "Microsoft Intune Deployment",
-    category: "Endpoint Management",
-    summary:
-      "Built a modern management baseline with Intune and Windows Autopilot — configuration profiles, compliance policies and app deployment for zero-touch provisioning.",
-    outcome:
-      "Achieved 98%+ endpoint compliance and cut device provisioning time with fully automated Autopilot enrollment.",
-    tech: ["Microsoft Intune", "Windows Autopilot", "Compliance Policies", "MDM / MAM"],
-    difficulty: "Advanced",
-    environment: "Intune / Endpoint",
-    deployment: "Production",
-    certs: ["MD-102", "MS-102"],
-    href: "https://github.com/lokeshm-it",
-    repo: "https://github.com/lokeshm-it",
-  },
-  {
-    slug: "zero-trust-device",
-    title: "Zero Trust Device Trust Enforcement",
-    category: "Zero Trust · Endpoint",
-    summary:
-      "Enforced device trust as a Conditional Access signal — only compliant, managed and healthy endpoints gain access to corporate resources.",
-    outcome:
-      "Closed the gap on unmanaged-device access and strengthened the endpoint perimeter with continuous compliance evaluation.",
-    tech: ["Conditional Access", "Intune Compliance", "Entra ID", "Defender for Endpoint"],
-    difficulty: "Advanced",
-    environment: "Entra ID / Intune",
-    deployment: "Production",
-    certs: ["SC-300", "MD-102"],
-    href: "https://github.com/lokeshm-it",
-    repo: "https://github.com/lokeshm-it",
-  },
-  {
-    slug: "entra-id-protection",
-    title: "Microsoft Entra ID Protection",
-    category: "Identity Security",
-    summary:
-      "Deployed risk-based identity protection with sign-in and user risk policies, automated remediation and MFA enforcement across the tenant.",
-    outcome:
-      "Improved identity posture with automated response to risky sign-ins and 100% MFA coverage for privileged access.",
-    tech: ["Entra ID Protection", "Risk Policies", "MFA", "Conditional Access"],
-    difficulty: "Intermediate",
-    environment: "Entra ID",
-    deployment: "Production",
-    certs: ["SC-300", "SC-900"],
-    href: "https://github.com/lokeshm-it",
-    repo: "https://github.com/lokeshm-it",
-  },
-  {
-    slug: "zero-trust-identity",
-    title: "Zero Trust Identity Perimeter",
-    category: "Zero Trust · Identity",
-    summary:
-      "Established identity as the primary control plane — layered Conditional Access, least-privilege RBAC and continuous verification across the estate.",
-    outcome:
-      "Shifted security from the network edge to identity, enabling secure remote and hybrid access without VPN dependency.",
-    tech: ["Zero Trust", "Entra ID", "Conditional Access", "RBAC", "SSPR"],
-    difficulty: "Advanced",
-    environment: "Entra ID / Zero Trust",
-    deployment: "Home Lab",
-    certs: ["SC-300", "SC-100"],
-    href: "https://github.com/lokeshm-it",
-    repo: "https://github.com/lokeshm-it",
-  },
-];
+/**
+ * Homepage project cards are derived directly from the single case-study
+ * data source (`src/lib/case-studies.ts`). Adding a new Microsoft project
+ * therefore only requires appending one object to `caseStudies` — this file,
+ * the homepage grid and the projects dashboard all update automatically with
+ * no further edits required.
+ */
+export const projects: Project[] = caseStudies.map((study) => ({
+  slug: study.slug,
+  title: study.title,
+  category: study.category,
+  hero: study.hero,
+  summary: study.tagline,
+  outcome: study.outcome,
+  tech: study.badges,
+  difficulty: study.difficulty,
+  environment: study.environment,
+  deployment: study.deployment,
+  certs: study.certifications,
+  href: study.repo.url,
+  repo: study.repo.url,
+}));
 
 /* ------------------------------------------------------------------ */
-/* Certifications                                                     */
+/* Certifications */
 /* ------------------------------------------------------------------ */
 
 export type CertStatus = "completed" | "in-progress" | "planned";
