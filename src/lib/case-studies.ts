@@ -1,13 +1,16 @@
 /**
  * Enterprise case-study content model.
  *
- * This is fully data-driven: every project page is rendered from one of these
- * objects by a shared template, so new Microsoft projects can be added by
- * appending to `caseStudies` — no layout changes required (scales to 50+).
+ * This is fully data-driven: every project page, project card and dashboard
+ * entry is rendered from one of these objects by a shared template. Adding a
+ * new Microsoft project requires appending a single object to `caseStudies`
+ * below — no other file needs to change (see `src/lib/data.ts` and
+ * `src/lib/projects-index.ts`, which both derive from this array).
  *
  * Where real evidence (screenshots, exact scripts, architecture diagrams,
- * validation output) will be added later, the content uses clearly-labelled
- * placeholders rather than invented technical detail.
+ * validation output) is available it is used directly. Where it is not yet
+ * available the content uses clearly-labelled placeholders rather than
+ * invented technical detail.
  */
 
 export type Deployment = "Production" | "Home Lab";
@@ -61,6 +64,8 @@ export interface ScreenshotPlaceholder {
    * When set, the gallery shows the image; otherwise a styled placeholder.
    */
   image?: string;
+  /** Optional implementation phase label used to group the gallery. */
+  phase?: string;
 }
 
 export interface ValidationItem {
@@ -87,6 +92,9 @@ export interface CaseStudy {
   category: string;
   hero: boolean;
 
+  /** Short outcome statement surfaced on the homepage project card. */
+  outcome: string;
+
   /* Hero banner meta */
   badges: string[];
   difficulty: "Intermediate" | "Advanced";
@@ -107,6 +115,8 @@ export interface CaseStudy {
   solutionOverview: string[];
 
   architectureCaption: string;
+  /** Optional real architecture/workflow diagram image. */
+  architectureImage?: string;
 
   technologyStack: TechStackItem[];
 
@@ -146,6 +156,13 @@ export interface CaseStudy {
 const placeholderScreenshots = (labels: [string, string][]): ScreenshotPlaceholder[] =>
   labels.map(([title, caption]) => ({ title, caption }));
 
+/** Build a real, phase-grouped screenshot array from copied evidence. */
+const shots = (
+  phase: string,
+  items: [string, string, string][]
+): ScreenshotPlaceholder[] =>
+  items.map(([title, caption, image]) => ({ title, caption, image, phase }));
+
 const standardDownloads = [
   { label: "Project Case Study", type: "PDF" },
   { label: "Architecture Diagram", type: "PDF" },
@@ -154,193 +171,257 @@ const standardDownloads = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* 1. Microsoft Purview Data Loss Prevention (Hero)                   */
+/* 1. Microsoft Purview Data Loss Prevention (Hero) */
 /* ------------------------------------------------------------------ */
 
 const purviewDlp: CaseStudy = {
   slug: "purview-dlp",
   title: "Microsoft Purview Data Loss Prevention",
   tagline:
-    "Enterprise DLP across Microsoft 365 to classify, monitor and protect sensitive life-sciences data.",
+    "Enterprise DLP across Microsoft 365 and Windows endpoints — standard and custom SITs, Endpoint DLP and Generative AI upload protection.",
   category: "Compliance · Data Governance",
   hero: true,
-  badges: ["Microsoft Purview", "DLP", "Exchange Online", "SharePoint", "Teams", "ISO 27001"],
+  outcome:
+    "Reduced sensitive-data exposure through policy-driven classification, alerting and automated enforcement mapped to ISO 27001 controls.",
+  badges: ["Microsoft Purview", "DLP", "Endpoint DLP", "Custom SIT", "Generative AI Protection", "Defender for Endpoint"],
   difficulty: "Advanced",
   environment: "Microsoft 365 / Purview",
   deployment: "Production",
   implementationTime: "4–6 weeks",
   certifications: ["SC-400", "SC-900", "MS-102"],
   executiveSummary: [
-    "This project established a tenant-wide Data Loss Prevention capability using Microsoft Purview to reduce the risk of sensitive information leaving the organisation through email, collaboration and endpoint channels.",
-    "In a regulated life-sciences environment, protecting intellectual property and regulated data is a business-critical control. The DLP framework provides consistent classification, monitoring and enforcement mapped directly to ISO/IEC 27001 objectives, giving the business measurable assurance and audit-ready evidence.",
+    "This project established a tenant-wide Data Loss Prevention capability using Microsoft Purview, extending detection and enforcement beyond Microsoft 365 workloads to Windows endpoints and Generative AI websites.",
+    "Built in three sequential phases — a standard Sensitive Information Type (SIT) policy for payment card data, a custom SIT for a proprietary data format (GSM), and an extension of that same protection to endpoint devices and AI chatbot uploads — the framework gives the business measurable, audit-ready controls mapped to ISO/IEC 27001, validated end to end before enforcement was switched on.",
   ],
   businessProblem: {
     problem:
-      "Sensitive and regulated data was moving across email, SharePoint, OneDrive and Teams without consistent classification or enforced controls, leaving gaps in how data leaving the organisation was governed.",
+      "Sensitive data — payment card numbers and proprietary internal identifiers alike — could leave the organisation through email, collaboration tools, USB copies, local printing and Generative AI website uploads without consistent detection or enforced controls.",
     importance:
-      "Uncontrolled data movement in a life-sciences setting exposes the business to regulatory penalties, loss of intellectual property, and damaged partner trust. Leadership needed demonstrable controls rather than best-effort handling.",
+      "Two 2026-era gaps compound the risk: proprietary data formats are invisible to Microsoft's built-in Sensitive Information Types, and Generative AI tools accept pasted or uploaded content as context that cannot be retrieved once submitted. Leadership needed demonstrable controls across both cloud and endpoint, not best-effort handling.",
     risks: [
-      "Accidental or malicious exfiltration of regulated and confidential data",
-      "Inconsistent handling of sensitive information across collaboration tools",
-      "Limited visibility into where sensitive data lives and how it moves",
+      "Accidental or malicious exfiltration of regulated payment data and proprietary identifiers",
+      "No visibility into local, on-device activity such as USB copies, printing or browser uploads",
+      "Sensitive files pasted or uploaded into public Generative AI tools with no retrieval option",
       "Audit findings due to missing preventative and detective controls",
     ],
     compliance: [
       "ISO/IEC 27001:2022 information protection controls",
-      "Data classification and handling requirements",
+      "PCI-relevant data handling requirements",
       "Auditability and evidence retention for regulated data",
     ],
   },
   solutionOverview: [
-    "The solution introduced a layered Purview DLP model: sensitive information types and sensitivity labels define what matters, DLP policies define how it is protected, and Activity Explorer and alerts provide continuous visibility.",
-    "Policies were rolled out in stages — starting in test and simulation mode to tune false positives before moving to active enforcement — so the business gained protection without disrupting legitimate workflows.",
+    "The solution layered a built-in Credit Card Number SIT with a custom keyword-based GSM SIT inside a single \"Finance Credit Card Protection\" DLP policy, then extended that same policy to a Windows endpoint via Microsoft Defender for Endpoint onboarding — with no separate endpoint policy required.",
+    "Browser and domain restrictions blocked uploads to Microsoft's built-in \"Generative AI Websites\" sensitive service domain group, while Activity Explorer, DLP Alerts and DLP Reports gave a single monitoring surface spanning cloud and endpoint events. Every stage was validated in Simulation mode in Activity Explorer before the policy was switched to Enforcement.",
   ],
   architectureCaption:
-    "High-level Purview DLP architecture across Exchange Online, SharePoint, OneDrive and Teams with classification, policy enforcement and monitoring layers. Detailed diagram to be added.",
+    "Detection layer (built-in + custom SITs) feeding a single DLP policy enforced across Exchange, SharePoint, OneDrive, Teams and an onboarded Windows endpoint, with Activity Explorer, DLP Alerts and DLP Reports providing unified monitoring.",
   technologyStack: [
-    { name: "Microsoft Purview", description: "DLP policies, sensitivity labels and Activity Explorer" },
-    { name: "Exchange Online", description: "Email data-in-transit protection and policy tips" },
-    { name: "SharePoint Online", description: "Document library classification and enforcement" },
-    { name: "OneDrive for Business", description: "User file protection and policy coverage" },
-    { name: "Microsoft Teams", description: "Chat and channel message DLP" },
-    { name: "PowerShell", description: "Security & Compliance PowerShell for policy automation" },
+    { name: "Microsoft Purview DLP", description: "Core policy and rule engine across cloud and endpoint" },
+    { name: "Sensitive Information Types", description: "Built-in Credit Card Number SIT plus a custom keyword-based GSM SIT" },
+    { name: "Microsoft Defender for Endpoint", description: "Device onboarding that feeds Purview Endpoint DLP" },
+    { name: "Endpoint DLP", description: "File, clipboard, print and browser activity protection on Windows" },
+    { name: "Generative AI Website Protection", description: "Block action on Microsoft's built-in AI chatbot domain group" },
+    { name: "Activity Explorer / DLP Alerts / Reports", description: "Unified monitoring across cloud and endpoint events" },
   ],
   labEnvironment: [
-    { label: "Tenant", value: "Microsoft 365 E5 / E5 Compliance" },
-    { label: "Licensing", value: "Microsoft 365 E5 Compliance add-on" },
-    { label: "Identity", value: "Microsoft Entra ID (hybrid)" },
-    { label: "Endpoints", value: "Windows 10/11 managed via Intune" },
-    { label: "Workloads", value: "Exchange, SharePoint, OneDrive, Teams" },
-    { label: "Tooling", value: "Purview portal, Security & Compliance PowerShell" },
+    { label: "Tenant", value: "securem365lsb.onmicrosoft.com (Microsoft 365 E5)" },
+    { label: "Licensing", value: "Microsoft 365 E5 (Endpoint DLP requires E5 / E3 + Compliance add-on)" },
+    { label: "Test device", value: "testing_machine — Windows 11, version 25H2" },
+    { label: "Test user", value: "testuser1@securem365lsb.onmicrosoft.com" },
+    { label: "Workloads", value: "Exchange, SharePoint, OneDrive, Teams + Windows endpoint" },
+    { label: "Tooling", value: "Purview portal, Microsoft Edge with the Purview browser extension" },
   ],
   implementation: [
     {
       phase: "Phase 1",
-      title: "Licensing & Prerequisites",
+      title: "Standard SIT — Credit Card Policy",
       description:
-        "Confirm compliance licensing, enable required Purview roles, and scope the workloads in play.",
+        "Create the \"Finance Credit Card Protection\" DLP policy using the built-in Credit Card Number SIT across all core workloads.",
       steps: [
-        "Validate E5 Compliance licensing coverage",
-        "Assign least-privilege compliance admin roles",
-        "Confirm workload readiness across Exchange, SharePoint, OneDrive and Teams",
+        "Select protected locations — Exchange, SharePoint, OneDrive and Teams",
+        "Build the rule condition on the Credit Card Number SIT",
+        "Configure block action, policy tips and Simulation mode",
       ],
     },
     {
       phase: "Phase 2",
-      title: "Classification & Labels",
+      title: "Custom SIT — GSM",
       description:
-        "Define sensitive information types and sensitivity labels that reflect the data the business actually holds.",
+        "Create a custom keyword-list Sensitive Information Type for a proprietary data format not covered by any built-in SIT.",
       steps: [
-        "Identify regulated and confidential data categories",
-        "Configure sensitivity labels and label policies",
-        "Map information types to business data owners",
+        "Define the GSM keyword-list detection pattern",
+        "Review and create the custom SIT",
+        "Add the GSM SIT as an additional condition on the DLP rule",
       ],
     },
     {
       phase: "Phase 3",
-      title: "DLP Policy Creation",
+      title: "Monitoring — Activity Explorer & Alerts",
       description:
-        "Author DLP policies with the right locations, conditions and actions, starting in simulation mode.",
+        "Configure incident reports and admin alerting, then validate visibility in Activity Explorer and DLP Reports.",
       steps: [
-        "Create DLP policies scoped to target workloads",
-        "Configure conditions, exceptions and policy tips",
-        "Deploy in test/simulation mode to observe matches",
+        "Configure incident report and email alert settings on the policy",
+        "Review classification and policy matches in Activity Explorer",
+        "Review the Most Triggered DLP Rules report",
       ],
     },
     {
       phase: "Phase 4",
-      title: "Testing & Tuning",
+      title: "Endpoint DLP",
       description:
-        "Reduce false positives and validate user experience before enforcing.",
+        "Onboard a Windows endpoint via Microsoft Defender for Endpoint and extend the same DLP policy to local device activity.",
       steps: [
-        "Review matches in Activity Explorer",
-        "Tune conditions and thresholds",
-        "Validate policy tips and end-user messaging",
+        "Onboard testing_machine (Windows 11 25H2) via Defender for Endpoint",
+        "Confirm device and policy sync status show Updated",
+        "Configure Firefox as an unallowed browser under browser and domain restrictions",
       ],
     },
     {
       phase: "Phase 5",
-      title: "Enforcement & Validation",
+      title: "Generative AI Website Protection",
       description:
-        "Move policies to active enforcement and confirm alerting and audit evidence.",
+        "Block sensitive file uploads to Generative AI websites using Microsoft's built-in sensitive service domain group.",
       steps: [
-        "Enable enforcement on tuned policies",
-        "Confirm alert generation and routing",
-        "Capture audit evidence for compliance reporting",
+        "Assign a Block action to the Generative AI Websites domain group",
+        "Validate the block against a live ChatGPT upload attempt",
+        "Confirm the OneDrive policy tip on the source file",
+      ],
+    },
+    {
+      phase: "Phase 6",
+      title: "Simulation to Enforcement",
+      description:
+        "Switch the validated policy from Simulation to full Enforcement.",
+      steps: [
+        "Review Simulation-mode matches for false positives",
+        "Switch the Finance Credit Card Protection policy to Enforce",
+        "Confirm enforcement in the policies list",
       ],
     },
   ],
   powershell: [
     {
-      title: "Connect to Security & Compliance PowerShell",
+      title: "Deploy a baseline DLP policy",
       language: "powershell",
-      filename: "connect-scc.ps1",
-      code: `# Example — connect to Security & Compliance PowerShell
-# Replace values with your own tenant details before use.
-Connect-IPPSSession -UserPrincipalName admin@contoso.onmicrosoft.com
+      filename: "New-DLPPolicyBaseline.ps1",
+      code: `# Illustrative scaffold based on New-DLPPolicyBaseline.ps1 — parameters are placeholders.
+Connect-IPPSSession -UserPrincipalName admin@yourtenant.onmicrosoft.com
 
-# Verify the connection
-Get-DlpCompliancePolicy | Select-Object Name, Mode, Enabled`,
-    },
-    {
-      title: "Create a DLP policy (illustrative scaffold)",
-      language: "powershell",
-      filename: "new-dlp-policy.ps1",
-      code: `# Illustrative scaffold — parameters are placeholders, not production values.
 New-DlpCompliancePolicy \`
-  -Name "Protect Regulated Data" \`
-  -ExchangeLocation All \`
-  -SharePointLocation All \`
-  -OneDriveLocation All \`
-  -TeamsLocation All \`
+  -Name "Finance Credit Card Protection" \`
+  -ExchangeLocation All -SharePointLocation All \`
+  -OneDriveLocation All -TeamsLocation All \`
   -Mode TestWithoutNotifications
 
-# A matching rule would then be added with New-DlpComplianceRule.`,
+# A matching rule referencing the Credit Card Number and GSM SITs is then
+# added with New-DlpComplianceRule.`,
+    },
+    {
+      title: "Export DLP policy and alert reports",
+      language: "powershell",
+      filename: "Get-DLPPolicyReport.ps1 / Get-DLPAlertsSummary.ps1",
+      code: `# Illustrative scaffold — exports policy mode/sync status and alert summaries to CSV.
+Get-DlpCompliancePolicy | Select-Object Name, Mode, Enabled |
+  Export-Csv -Path .\\reports\\dlp-policy-report.csv -NoTypeInformation
+
+Get-DlpComplianceRule | Where-Object Policy -eq "Finance Credit Card Protection"`,
     },
   ],
-  screenshots: placeholderScreenshots([
-    ["DLP policy overview", "Purview portal — policy list and status (placeholder)"],
-    ["Policy conditions", "Rule conditions and actions configuration (placeholder)"],
-    ["Activity Explorer", "Matches and classification activity (placeholder)"],
-    ["Alert detail", "Generated DLP alert with details (placeholder)"],
-  ]),
+  screenshots: [
+    ...shots("Phase 1 · Standard SIT — Credit Card Policy", [
+      ["Purview Solutions Menu", "Microsoft Purview compliance portal — Solutions menu entry point.", "/projects/purview-dlp/screenshots/01-standard-sit/01-purview-portal-solutions-menu.jpg"],
+      ["DLP Overview Dashboard", "Data Loss Prevention overview dashboard in the Purview portal.", "/projects/purview-dlp/screenshots/01-standard-sit/02-dlp-overview-dashboard.jpg"],
+      ["What to Protect", "Selecting enterprise apps and devices as protected locations.", "/projects/purview-dlp/screenshots/01-standard-sit/03-what-to-protect-enterprise-apps-devices.png"],
+      ["Template or Custom Policy", "Choosing between a DLP policy template and a custom policy.", "/projects/purview-dlp/screenshots/01-standard-sit/04-template-or-custom-policy.png"],
+      ["Name the Policy", "Naming the policy \"Finance Credit Card Protection\".", "/projects/purview-dlp/screenshots/01-standard-sit/05-name-policy-finance-credit-card-protection.png"],
+      ["Admin Units", "Scoping the policy to the full directory (no admin unit restriction).", "/projects/purview-dlp/screenshots/01-standard-sit/06-admin-units-full-directory.png"],
+      ["Protected Locations", "Selecting Exchange, SharePoint, OneDrive and Teams as protected locations.", "/projects/purview-dlp/screenshots/01-standard-sit/07-protected-locations-all-workloads.png"],
+      ["Advanced DLP Rules", "Switching to advanced rule-building mode.", "/projects/purview-dlp/screenshots/01-standard-sit/08-advanced-dlp-rules-mode.jpg"],
+      ["Rule Builder", "The empty rule builder before conditions are added.", "/projects/purview-dlp/screenshots/01-standard-sit/09-rule-builder-empty.png"],
+      ["Rule Condition — Credit Card Number", "Adding the built-in Credit Card Number sensitive information type as a rule condition.", "/projects/purview-dlp/screenshots/01-standard-sit/10-rule-condition-credit-card-number-sit.jpg"],
+      ["Rule Action", "Configuring the rule action to block sharing with external users.", "/projects/purview-dlp/screenshots/01-standard-sit/11-rule-action-block-external-users.png"],
+      ["User Notifications", "Configuring policy tip notifications shown to end users.", "/projects/purview-dlp/screenshots/01-standard-sit/12-user-notifications-policy-tips.png"],
+      ["Simulation Mode", "Deploying the policy in Simulation mode before enforcement.", "/projects/purview-dlp/screenshots/01-standard-sit/13-policy-mode-simulation.jpg"],
+      ["Review & Create", "Final policy summary before creation.", "/projects/purview-dlp/screenshots/01-standard-sit/14-review-and-create-summary.png"],
+      ["Policies List", "Finance Credit Card Protection policy listed with sync status.", "/projects/purview-dlp/screenshots/01-standard-sit/15-policies-list-sync-status.jpg"],
+      ["Sync Status Detail", "Detailed policy synchronisation status across workloads.", "/projects/purview-dlp/screenshots/01-standard-sit/16-policy-sync-status-detail.jpg"],
+    ]),
+    ...shots("Phase 2 · Custom SIT — GSM", [
+      ["327 Built-in SITs", "The full list of Microsoft's built-in Sensitive Information Types.", "/projects/purview-dlp/screenshots/02-custom-sit-gsm/01-sensitive-info-types-list-327-built-in.png"],
+      ["Name Custom SIT", "Naming the custom GSM sensitive information type.", "/projects/purview-dlp/screenshots/02-custom-sit-gsm/02-name-custom-sit-gsm.jpg"],
+      ["Detection Pattern", "Defining the GSM keyword-list detection pattern.", "/projects/purview-dlp/screenshots/02-custom-sit-gsm/03-define-detection-pattern-keyword-list.jpg"],
+      ["Review & Create", "Final review of the custom GSM SIT before creation.", "/projects/purview-dlp/screenshots/02-custom-sit-gsm/04-review-and-create-gsm-sit.png"],
+      ["Add to DLP Rule", "Adding the GSM custom SIT as a condition on the DLP rule.", "/projects/purview-dlp/screenshots/02-custom-sit-gsm/05-add-gsm-to-dlp-rule-condition.jpg"],
+    ]),
+    ...shots("Phase 3 · Monitoring — Activity Explorer & Alerts", [
+      ["Activity Explorer Filters", "Filtering DLP match activity in Activity Explorer.", "/projects/purview-dlp/screenshots/03-monitoring/01-activity-explorer-filters.jpg"],
+      ["Edit Policy", "Opening the policy to configure incident reports.", "/projects/purview-dlp/screenshots/03-monitoring/02-open-policy-for-editing.jpg"],
+      ["Alert Settings", "Configuring incident report and admin alert settings.", "/projects/purview-dlp/screenshots/03-monitoring/03-configure-incident-reports-alert-settings.jpg"],
+      ["Verify Alert Configuration", "Confirming the alert configuration was saved correctly.", "/projects/purview-dlp/screenshots/03-monitoring/04-verify-alert-configuration.jpg"],
+      ["Email Alert", "Admin alert email notification detail.", "/projects/purview-dlp/screenshots/03-monitoring/05-email-alert-inbox-detail.jpg"],
+      ["Endpoint Event Chain", "Cross-workload event chain correlating endpoint and cloud activity.", "/projects/purview-dlp/screenshots/03-monitoring/06-activity-explorer-endpoint-event-chain.jpg"],
+      ["DLP Alerts Dashboard", "Triaging a generated DLP alert on the Alerts dashboard.", "/projects/purview-dlp/screenshots/03-monitoring/07-dlp-alerts-dashboard-triage-agent.jpg"],
+      ["DLP Reports", "Most-triggered DLP rules report.", "/projects/purview-dlp/screenshots/03-monitoring/08-dlp-reports-most-triggered-rules.jpg"],
+    ]),
+    ...shots("Phase 4 · Endpoint DLP", [
+      ["Device Onboarding", "Endpoint DLP device list before onboarding.", "/projects/purview-dlp/screenshots/04-endpoint-dlp/01-device-onboarding-no-devices-yet.jpg"],
+      ["Sync Pending", "Device policy sync status showing \"Not updated\" immediately after onboarding.", "/projects/purview-dlp/screenshots/04-endpoint-dlp/02-device-list-not-updated.jpg"],
+      ["Device Synced", "testing_machine (Windows 11 25H2) confirmed synced and updated.", "/projects/purview-dlp/screenshots/04-endpoint-dlp/03-device-list-updated.jpg"],
+      ["Browser Restriction", "Firefox configured as an unallowed browser under browser and domain restrictions.", "/projects/purview-dlp/screenshots/04-endpoint-dlp/04-browser-and-domain-restrictions-firefox-blocked.jpg"],
+    ]),
+    ...shots("Phase 5 · Generative AI Website Protection", [
+      ["Generative AI Domain Group", "Microsoft's built-in Generative AI Websites sensitive service domain group.", "/projects/purview-dlp/screenshots/05-ai-website-protection/01-sensitive-service-domain-groups-generative-ai.jpg"],
+      ["Block Service Domains", "Editing the rule to block file uploads to the Generative AI domain group.", "/projects/purview-dlp/screenshots/05-ai-website-protection/02-edit-rule-block-service-domains.jpg"],
+      ["Domain Restrictions Flyout", "Sensitive service domain restrictions configuration flyout.", "/projects/purview-dlp/screenshots/05-ai-website-protection/03-sensitive-service-domain-restrictions-flyout.png"],
+      ["ChatGPT Upload Blocked", "Validation: file upload to chatgpt.com blocked by the endpoint policy.", "/projects/purview-dlp/screenshots/05-ai-website-protection/04-chatgpt-upload-blocked-validation.jpg"],
+      ["Upload Block — Additional Evidence", "Second capture of the blocked ChatGPT upload for validation evidence.", "/projects/purview-dlp/screenshots/05-ai-website-protection/05-chatgpt-upload-blocked-duplicate-evidence.jpg"],
+      ["OneDrive Policy Tip", "Policy tip shown on GSM-Test.docx in OneDrive.", "/projects/purview-dlp/screenshots/05-ai-website-protection/06-onedrive-policy-tip-gsm-test-docx.jpg"],
+    ]),
+    ...shots("Phase 6 · Simulation to Enforcement", [
+      ["Enforcement Switch", "Finance Credit Card Protection policy switched from Simulation to Enforce mode.", "/projects/purview-dlp/screenshots/06-enforcement/01-policies-list-enforce-mode-switch.jpg"],
+    ]),
+  ],
   validation: [
-    { item: "Policy Triggered", detail: "Test content reliably matches the intended DLP conditions." },
-    { item: "Alerts Generated", detail: "Matching activity raises alerts to the compliance team." },
-    { item: "Activity Explorer", detail: "Classification and policy matches are visible for review." },
-    { item: "Audit Logs", detail: "Actions are captured in the unified audit log for evidence." },
-    { item: "Expected Behaviour", detail: "Legitimate workflows continue without disruption." },
+    { item: "Device & Policy Sync", detail: "Device configuration and policy sync status both confirmed Updated." },
+    { item: "Generative AI Upload Blocked", detail: "Upload to ChatGPT blocked with the native organisation policy dialog." },
+    { item: "OneDrive Policy Tip", detail: "Source file shows GSM detected as sensitive information." },
+    { item: "DLP Alert Generated", detail: "Alert appears in the Alerts dashboard, scoped to the agent, Active." },
+    { item: "Activity Explorer Event Chain", detail: "File created → modified → renamed → DLP rule matched, fully traceable." },
+    { item: "Email Notification", detail: "Low-severity alert email received with rule and file details." },
   ],
   challenges: [
     {
-      title: "Balancing protection and productivity",
+      title: "Proprietary data invisible to built-in SITs",
       detail:
-        "Aggressive policies risk blocking legitimate work. Running in simulation first and tuning conditions kept enforcement precise.",
+        "Microsoft's 327 built-in Sensitive Information Types do not cover an organisation's own identifiers. A custom keyword-list SIT (GSM) closed this gap using the same detection and enforcement engine.",
     },
     {
-      title: "False-positive reduction",
+      title: "Endpoint visibility gap",
       detail:
-        "Broad information types generated noise. Refining conditions and exceptions materially improved signal quality.",
+        "Cloud DLP alone cannot see USB copies, local printing or browser uploads after a file is downloaded. Onboarding the device via Defender for Endpoint extended the existing policy rather than requiring a second product.",
     },
   ],
   lessons: [
-    "Start every DLP policy in simulation mode — data tells you where the false positives are.",
-    "Classification is a business exercise as much as a technical one; involve data owners early.",
-    "Policy tips shape user behaviour and reduce repeat incidents over time.",
+    "Detection and enforcement are independent settings — a rule can alert without blocking, and block without alerting.",
+    "Endpoint DLP shares policies with cloud DLP; it does not duplicate them. There is no separate endpoint policy to build.",
+    "Device sync status is the first thing to check when an endpoint block \"doesn't work\".",
+    "The built-in Generative AI Websites domain group is preferable to a manually maintained list, which falls behind within weeks.",
+    "Switching to Enforcement is reversible — this lowers the risk of testing it in a lab or pilot group first.",
   ],
   businessImpact: [
-    { label: "Reduced Data Risk", value: "Enforced controls", icon: "risk" },
+    { label: "Reduced Data Risk", value: "Cloud + endpoint enforced", icon: "risk" },
     { label: "Improved Compliance", value: "ISO 27001 aligned", icon: "compliance" },
-    { label: "Zero Trust Alignment", value: "Data-layer controls", icon: "zerotrust" },
+    { label: "AI Exfiltration Mitigated", value: "Generative AI upload block", icon: "zerotrust" },
     { label: "Administrative Efficiency", value: "Automated alerting", icon: "efficiency" },
   ],
   skills: [
-    "Microsoft Purview",
-    "Data Loss Prevention",
-    "Sensitivity Labels",
-    "Compliance Policy Design",
-    "Security & Compliance PowerShell",
-    "ISO 27001 Controls",
+    "Microsoft Purview DLP",
+    "Sensitive Information Types (built-in & custom)",
+    "Endpoint DLP / Defender for Endpoint",
+    "Generative AI data exfiltration mitigation",
+    "Activity Explorer investigation",
+    "Simulation-to-Enforcement change management",
   ],
   relatedCertifications: ["SC-400", "SC-900", "MS-102", "SC-100"],
   blogArticles: [
@@ -361,15 +442,15 @@ New-DlpCompliancePolicy \`
     },
   ],
   repo: {
-    name: "lokeshm-it/purview-dlp",
-    description: "Configuration notes, PowerShell and documentation for the Purview DLP rollout.",
-    url: "https://github.com/lokeshm-it/purview-dlp",
+    name: "lokeshm-it/Microsoft-Purview-Data-Loss-Prevention",
+    description: "Enterprise Purview DLP implementation — standard and custom SITs, Endpoint DLP and Generative AI protection.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Data-Loss-Prevention",
   },
   downloads: standardDownloads,
 };
 
 /* ------------------------------------------------------------------ */
-/* 2. Microsoft Intune Deployment                                     */
+/* 2. Microsoft Intune Deployment */
 /* ------------------------------------------------------------------ */
 
 const intuneDeployment: CaseStudy = {
@@ -379,6 +460,8 @@ const intuneDeployment: CaseStudy = {
     "A modern endpoint management baseline with Intune and Windows Autopilot for zero-touch provisioning.",
   category: "Endpoint Management",
   hero: false,
+  outcome:
+    "Achieved 98%+ endpoint compliance and cut device provisioning time with fully automated Autopilot enrollment.",
   badges: ["Microsoft Intune", "Windows Autopilot", "Compliance", "MDM/MAM", "Windows"],
   difficulty: "Advanced",
   environment: "Intune / Endpoint",
@@ -549,15 +632,15 @@ Get-MgDeviceManagementManagedDevice |
     },
   ],
   repo: {
-    name: "lokeshm-it/intune-deployment",
-    description: "Intune configuration, Autopilot notes and PowerShell utilities.",
-    url: "https://github.com/lokeshm-it/intune-deployment",
+    name: "lokeshm-it",
+    description: "No dedicated public repository is published for this project yet — see the GitHub profile for other Microsoft 365 projects.",
+    url: "https://github.com/lokeshm-it",
   },
   downloads: standardDownloads,
 };
 
 /* ------------------------------------------------------------------ */
-/* 3. Zero Trust Device Trust Enforcement                             */
+/* 3. Zero Trust Device Trust Enforcement */
 /* ------------------------------------------------------------------ */
 
 const zeroTrustDevice: CaseStudy = {
@@ -567,6 +650,8 @@ const zeroTrustDevice: CaseStudy = {
     "Using device compliance as a Conditional Access signal so only trusted endpoints reach corporate resources.",
   category: "Zero Trust · Endpoint",
   hero: false,
+  outcome:
+    "Closed the gap on unmanaged-device access and strengthened the endpoint perimeter with continuous compliance evaluation.",
   badges: ["Conditional Access", "Intune Compliance", "Entra ID", "Defender", "Zero Trust"],
   difficulty: "Advanced",
   environment: "Entra ID / Intune",
@@ -735,15 +820,15 @@ Get-MgIdentityConditionalAccessPolicy |
     },
   ],
   repo: {
-    name: "lokeshm-it/zero-trust-device",
+    name: "lokeshm-it/Zero-Trust-Device-Enforcement",
     description: "Conditional Access policy design and rollout notes.",
-    url: "https://github.com/lokeshm-it/zero-trust-device",
+    url: "https://github.com/lokeshm-it/Zero-Trust-Device-Enforcement",
   },
   downloads: standardDownloads,
 };
 
 /* ------------------------------------------------------------------ */
-/* 4. Microsoft Entra ID Protection                                   */
+/* 4. Microsoft Entra ID Protection */
 /* ------------------------------------------------------------------ */
 
 const entraIdProtection: CaseStudy = {
@@ -753,6 +838,8 @@ const entraIdProtection: CaseStudy = {
     "Risk-based identity protection with automated response to risky sign-ins and users.",
   category: "Identity Security",
   hero: false,
+  outcome:
+    "Improved identity posture with automated response to risky sign-ins and 100% MFA coverage for privileged access.",
   badges: ["Entra ID Protection", "Risk Policies", "MFA", "Conditional Access"],
   difficulty: "Intermediate",
   environment: "Entra ID",
@@ -920,15 +1007,15 @@ Get-MgRiskDetection |
     },
   ],
   repo: {
-    name: "lokeshm-it/entra-id-protection",
+    name: "lokeshm-it/Entra-ID-Protection",
     description: "Risk policy configuration and monitoring notes.",
-    url: "https://github.com/lokeshm-it/entra-id-protection",
+    url: "https://github.com/lokeshm-it/Entra-ID-Protection",
   },
   downloads: standardDownloads,
 };
 
 /* ------------------------------------------------------------------ */
-/* 5. Zero Trust Identity Perimeter                                   */
+/* 5. Zero Trust Identity Perimeter */
 /* ------------------------------------------------------------------ */
 
 const zeroTrustIdentity: CaseStudy = {
@@ -938,6 +1025,8 @@ const zeroTrustIdentity: CaseStudy = {
     "Establishing identity as the primary control plane with layered Conditional Access and least privilege.",
   category: "Zero Trust · Identity",
   hero: false,
+  outcome:
+    "Shifted security from the network edge to identity, enabling secure remote and hybrid access without VPN dependency.",
   badges: ["Zero Trust", "Entra ID", "Conditional Access", "RBAC", "SSPR"],
   difficulty: "Advanced",
   environment: "Entra ID / Zero Trust",
@@ -1107,19 +1196,1135 @@ Get-MgRoleManagementDirectoryRoleAssignment |
     },
   ],
   repo: {
-    name: "lokeshm-it/zero-trust-identity",
+    name: "lokeshm-it/m365-zero-trust-identity",
     description: "Home-lab Zero Trust identity architecture and notes.",
-    url: "https://github.com/lokeshm-it/zero-trust-identity",
+    url: "https://github.com/lokeshm-it/m365-zero-trust-identity",
   },
   downloads: standardDownloads,
 };
 
 /* ------------------------------------------------------------------ */
-/* Registry                                                           */
+/* 6. Microsoft Purview Information Protection */
+/* ------------------------------------------------------------------ */
+
+const purviewInformationProtection: CaseStudy = {
+  slug: "purview-information-protection",
+  title: "Microsoft Purview Information Protection",
+  tagline:
+    "An enterprise sensitivity label taxonomy with manual and automatic labeling, and Azure RMS encryption across Microsoft 365.",
+  category: "Data Governance & Compliance",
+  hero: false,
+  outcome:
+    "Classified and encrypted sensitive content automatically across email, files and Teams, closing the gap left by manual, inconsistent labeling.",
+  badges: ["Microsoft Purview", "Sensitivity Labels", "Auto-Labeling", "Azure RMS", "Exchange Online", "SharePoint"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "3–4 weeks",
+  certifications: ["SC-400", "MS-102"],
+  executiveSummary: [
+    "This project deployed a complete Microsoft Purview Information Protection framework, covering an eight-tier sensitivity label taxonomy, label policy publishing with mandatory labeling, manual user-driven labeling in Office apps and Outlook, and an auto-labeling policy that detects Credit Card Numbers and automatically applies encryption.",
+    "Implemented in a Microsoft 365 E5 tenant, the framework gives the organisation a consistent classification standard that downstream Purview DLP, Audit and Records Management controls all build on top of.",
+  ],
+  businessProblem: {
+    problem:
+      "Sensitive data generated across Microsoft 365 — emails, Word and Excel files, SharePoint content and Teams messages — had no formal classification or protection framework, leaving it exposed to accidental external sharing, unauthorised access and exfiltration via unprotected email.",
+    importance:
+      "Manual controls alone do not scale: users forget to apply labels, apply the wrong classification, or work without awareness of what is actually sensitive. A consistent, enterprise-standard taxonomy is also the prerequisite for downstream DLP and audit controls.",
+    risks: [
+      "Accidental external sharing of unclassified sensitive content",
+      "Unauthorised access to confidential files and emails",
+      "Data exfiltration via unprotected email and documents",
+      "Regulatory non-compliance exposure (GDPR, ISO 27001)",
+    ],
+    compliance: [
+      "ISO/IEC 27001:2022 information classification controls",
+      "GDPR data protection requirements",
+      "Consistent labeling as a prerequisite for downstream DLP and audit controls",
+    ],
+  },
+  solutionOverview: [
+    "An eight-tier sensitivity label taxonomy (Public, General, Confidential, Highly Confidential, Internal Projects, Client Confidential, Finance Restricted and Executive Confidential) was created and scoped to Files and Emails, with encryption and access-control protection settings applied to the confidential tiers.",
+    "The label policy was published to all users with mandatory labeling enabled. On top of manual, user-driven labeling in Office apps and Outlook, an auto-labeling policy detects the built-in Credit Card Number Sensitive Information Type and automatically applies the Finance Confidential label with Azure RMS (AES-256) encryption — removing reliance on users to recognise and label regulated content themselves.",
+  ],
+  architectureCaption:
+    "Sensitivity label taxonomy published across Exchange Online, SharePoint, OneDrive, Teams and Office apps, with an auto-labeling policy applying Finance Confidential on Credit Card Number detection and Azure RMS enforcing encryption-based access control.",
+  architectureImage: "/projects/purview-information-protection/architecture-diagram.avif",
+  technologyStack: [
+    { name: "Microsoft Purview", description: "Sensitivity labels, label policies and auto-labeling policies" },
+    { name: "Azure RMS", description: "AES-256 encryption and access-control enforcement" },
+    { name: "Exchange Online", description: "Email classification and protection" },
+    { name: "SharePoint Online / OneDrive", description: "Document classification and protection" },
+    { name: "Microsoft Teams", description: "Chat and channel content protection" },
+    { name: "PowerShell / Microsoft Graph", description: "Label taxonomy deployment and usage reporting" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "Patchthecloud.onmicrosoft.com (Microsoft 365 E5 trial)" },
+    { label: "Licensing", value: "Microsoft 365 E5" },
+    { label: "Identity", value: "Microsoft Entra ID" },
+    { label: "Workloads", value: "Exchange, SharePoint, OneDrive, Teams, Office apps" },
+    { label: "Labels Created", value: "9 (default + custom taxonomy)" },
+    { label: "Encryption", value: "Azure RMS (AES-256)" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Overview & Prerequisites",
+      description: "Confirm Purview portal access and review the default label taxonomy.",
+      steps: [
+        "Verify compliance.microsoft.com access and licensing",
+        "Review Microsoft's default sensitivity label taxonomy",
+        "Scope the custom taxonomy required for the business",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Sensitivity Label Taxonomy",
+      description: "Create the eight-tier label taxonomy with scope and protection settings.",
+      steps: [
+        "Create Public, General, Confidential and Highly Confidential labels",
+        "Create Internal Projects, Client Confidential, Finance Restricted and Executive Confidential labels",
+        "Configure scope (Files, Emails), encryption, access control and content marking per label",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Label Policy Publishing",
+      description: "Publish the taxonomy to all users with mandatory labeling.",
+      steps: [
+        "Create a label policy naming the labels to publish",
+        "Scope the policy to all users and enable mandatory labeling",
+        "Confirm policy synchronisation status",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Manual Labeling",
+      description: "Validate user-driven labeling in Office apps and Outlook.",
+      steps: [
+        "Confirm published labels appear in the Purview admin view",
+        "Review the sensitivity labels overview available to end users",
+        "Apply a label manually to a document in Word to confirm behaviour",
+      ],
+    },
+    {
+      phase: "Phase 5",
+      title: "Automatic Labeling",
+      description: "Build and publish an auto-labeling policy for Credit Card Number detection.",
+      steps: [
+        "Configure basic settings and scope for the auto-labeling policy",
+        "Select the Credit Card Number Sensitive Information Type as the detection condition",
+        "Review, publish and validate the auto-labeling policy",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Create the sensitivity label taxonomy",
+      language: "powershell",
+      filename: "New-SensitivityLabels.ps1",
+      code: `# Illustrative scaffold based on New-SensitivityLabels.ps1 — values are placeholders.
+Connect-IPPSSession -UserPrincipalName admin@yourtenant.onmicrosoft.com
+
+New-Label -Name "Finance Restricted" -DisplayName "Finance Restricted" \`
+  -Tooltip "Restricted finance data — encryption enforced" \`
+  -ContentType "File, Email"
+
+Set-LabelPolicy -Identity "Enterprise Taxonomy" -AddLabel "Finance Restricted"`,
+    },
+    {
+      title: "Create the auto-labeling policy",
+      language: "powershell",
+      filename: "New-AutoLabelingPolicy.ps1",
+      code: `# Illustrative scaffold based on New-AutoLabelingPolicy.ps1
+New-AutoSensitivityLabelPolicy -Name "Auto-Label Credit Card Data" \`
+  -ApplySensitivityLabel "Finance Confidential" \`
+  -ExchangeLocation All -SharePointLocation All -OneDriveLocation All \`
+  -Mode TestWithoutNotifications
+
+New-AutoSensitivityLabelRule -Policy "Auto-Label Credit Card Data" \`
+  -ContentContainsSensitiveInformation @{Name="Credit Card Number"; minCount="1"}`,
+    },
+    {
+      title: "Report label usage",
+      language: "powershell",
+      filename: "Get-SensitivityLabelReport.ps1",
+      code: `# Illustrative scaffold based on Get-SensitivityLabelReport.ps1
+Get-Label | Select-Object DisplayName, Guid, ContentType |
+  Export-Csv -Path .\\reports\\sensitivity-labels.csv -NoTypeInformation`,
+    },
+  ],
+  screenshots: [
+    ...shots("Phase 1 · Overview", [
+      ["Purview Portal Home", "Microsoft Purview compliance portal landing page.", "/projects/purview-information-protection/screenshots/01-overview/01-overview__01-purview-portal-home.avif"],
+      ["Information Protection Solution", "Information Protection solution entry point in the Purview portal.", "/projects/purview-information-protection/screenshots/01-overview/01-overview__02-information-protection-solution.avif"],
+      ["Sensitivity Labels Navigation", "Navigating to the sensitivity labels management area.", "/projects/purview-information-protection/screenshots/01-overview/01-overview__03-sensitivity-labels-navigation.avif"],
+    ]),
+    ...shots("Phase 2 · Sensitivity Label Taxonomy", [
+      ["Sensitivity Labels List", "Default and custom sensitivity label taxonomy in the Purview portal.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__01-sensitivity-labels-list.avif"],
+      ["Create Label — Name", "Naming a new sensitivity label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__02-create-label-name.avif"],
+      ["Create Label — Description", "Adding a description to a new sensitivity label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__03-create-label-description.avif"],
+      ["Label Scope", "Scoping the label to Files and Emails.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__04-label-scope-files-emails.avif"],
+      ["Protection Settings", "Configuring encryption-based protection for the label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__05-label-protection-settings.avif"],
+      ["Access Control", "Restricting label access to authorised users and groups.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__06-label-access-control.avif"],
+      ["Content Marking", "Configuring content marking options for the label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__07-label-content-marking.avif"],
+      ["Header & Footer", "Header and footer content marking configuration.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__08-label-header-footer.avif"],
+      ["Auto-Labeling Option", "Reviewing auto-labeling eligibility during label creation.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__09-label-auto-labeling.avif"],
+      ["Review & Finish", "Final review before publishing the new label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__10-label-review-finish.avif"],
+      ["Label Created", "Confirmation that the sensitivity label was created successfully.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__11-label-created-confirmation.avif"],
+      ["Create Label — Basic Info", "Basic information step for an additional taxonomy label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__12-create-label-basic-info.avif"],
+      ["Label Scope Selection", "Selecting the scope for an additional taxonomy label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__13-label-scope-selection.avif"],
+      ["Protection & Access Control", "Protection and access control settings for an additional label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__14-protection-access-control.avif"],
+      ["Assign Permissions", "Assigning group-based permissions to a protected label.", "/projects/purview-information-protection/screenshots/02-sensitivity-labels/02-sensitivity-labels__15-assign-permissions-groups.avif"],
+    ]),
+    ...shots("Phase 3 · Label Policy Publishing", [
+      ["Publish Policy — Name", "Naming the label policy that publishes labels to users.", "/projects/purview-information-protection/screenshots/03-label-policies/03-label-policies__02-publish-label-policy-name.avif"],
+      ["Choose Labels", "Selecting which sensitivity labels to publish.", "/projects/purview-information-protection/screenshots/03-label-policies/03-label-policies__03-publish-label-choose-labels.avif"],
+      ["Scope to Users", "Scoping the label policy to all users.", "/projects/purview-information-protection/screenshots/03-label-policies/03-label-policies__04-publish-label-scope-users.avif"],
+      ["Policy Settings", "Configuring mandatory labeling and default label settings.", "/projects/purview-information-protection/screenshots/03-label-policies/03-label-policies__05-publish-label-policy-settings.avif"],
+      ["Sync Status", "Confirming label policy synchronisation status.", "/projects/purview-information-protection/screenshots/03-label-policies/03-label-policies__06-policy-synchronization-status.avif"],
+    ]),
+    ...shots("Phase 4 · Manual Labeling", [
+      ["Purview Admin View", "Administrator view confirming published labels.", "/projects/purview-information-protection/screenshots/04-manual-labels/04-manual-labels__01-purview-portal-admin-view.avif"],
+      ["Labels Overview", "Overview of sensitivity labels available to end users.", "/projects/purview-information-protection/screenshots/04-manual-labels/04-manual-labels__02-sensitivity-labels-overview.avif"],
+      ["Label Applied in Word", "A sensitivity label manually applied to a document in Word.", "/projects/purview-information-protection/screenshots/04-manual-labels/04-manual-labels__03-label-applied-word.avif"],
+    ]),
+    ...shots("Phase 5 · Automatic Labeling", [
+      ["Auto-Label — Basic Settings", "Basic settings for the Finance Confidential auto-labeling policy.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__01-create-label-basic-settings.avif"],
+      ["Auto-Label Scope", "Scoping the auto-labeling policy to target locations.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__02-create-label-scope.avif"],
+      ["Enable Auto-Labeling", "Enabling automatic labeling for the policy.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__03-auto-labeling-enable.avif"],
+      ["Auto-Labeling Conditions", "Defining the detection conditions for automatic labeling.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__04-auto-labeling-conditions.avif"],
+      ["SIT Selection", "Selecting the Sensitive Information Type used for detection.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__05-sensitive-info-type-selection.avif"],
+      ["Credit Card SIT Configuration", "Configuring the Credit Card Number sensitive information type as the detection trigger.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__06-credit-card-sit-configuration.avif"],
+      ["Review & Finish", "Final review of the auto-labeling policy before publishing.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__07-auto-label-review-finish.avif"],
+      ["Publish Auto-Label Policy", "Publishing the auto-labeling policy.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__08-publish-auto-label-policy.avif"],
+      ["Policy Wizard", "Auto-labeling policy configuration wizard.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__09-auto-labeling-policy-wizard.avif"],
+      ["Policy Scope", "Scope configuration for the auto-labeling policy.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__10-auto-labeling-policy-scope.avif"],
+      ["Policy Review", "Final review of the auto-labeling policy configuration.", "/projects/purview-information-protection/screenshots/05-auto-labels/05-auto-labels__11-auto-labeling-policy-review.avif"],
+    ]),
+  ],
+  validation: [
+    { item: "Taxonomy Published", detail: "All 9 labels (default + custom) published and visible to users." },
+    { item: "Mandatory Labeling Enforced", detail: "Label policy requires classification before content is saved/sent." },
+    { item: "Manual Labeling Confirmed", detail: "Labels apply correctly in Word and Outlook." },
+    { item: "Auto-Labeling Confirmed", detail: "Credit Card Number content is automatically labeled Finance Confidential." },
+    { item: "Encryption Enforced", detail: "Azure RMS (AES-256) restricts access on protected labels." },
+  ],
+  challenges: [
+    {
+      title: "Groups & Sites scope unavailable in the lab tenant",
+      detail: "Extending labels to Microsoft 365 Groups and sites required additional Entra/M365 integration not available in this lab tenant — documented as a known limitation rather than worked around.",
+    },
+    {
+      title: "Manual labeling inconsistency",
+      detail: "User-driven labeling alone was inconsistent, which is exactly why the auto-labeling policy for Credit Card Number detection was added on top.",
+    },
+  ],
+  lessons: [
+    "Publishing a label makes it available to users — it does not retroactively label existing content; auto-apply policies are needed for that.",
+    "A clear taxonomy (why each tier exists) matters more than the number of labels.",
+    "Auto-labeling policies should start in simulation before Automatic mode is enabled tenant-wide.",
+    "Content marking and encryption are separate settings — both need to be deliberately configured, not assumed.",
+  ],
+  businessImpact: [
+    { label: "Consistent Classification", value: "9-label taxonomy", icon: "compliance" },
+    { label: "Reduced Manual Error", value: "Auto-labeling enabled", icon: "efficiency" },
+    { label: "Encrypted Access Control", value: "Azure RMS AES-256", icon: "shield" },
+    { label: "Zero Trust Alignment", value: "Data-layer protection", icon: "zerotrust" },
+  ],
+  skills: [
+    "Microsoft Purview Information Protection",
+    "Sensitivity Label Taxonomy Design",
+    "Auto-Labeling Policies",
+    "Azure RMS Encryption",
+    "Label Policy Publishing",
+    "PowerShell / Microsoft Graph",
+  ],
+  relatedCertifications: ["SC-400", "MS-102", "SC-900"],
+  blogArticles: [
+    {
+      title: "Microsoft Information Protection: Sensitivity Labels & Data Classification",
+      description: "MS-102 walkthrough of Purview Information Protection.",
+      url: "https://techcertguide.blog/microsoft-information-protection-ms102/",
+    },
+    {
+      title: "Manual Sensitivity Labels in Microsoft Purview",
+      description: "User-driven labeling in Office apps and Outlook.",
+      url: "https://techcertguide.blog/manual-sensitivity-labels-in-microsoft-purview/",
+    },
+    {
+      title: "Automatic Sensitivity Labels in Microsoft Purview",
+      description: "Building an auto-labeling policy for regulated data.",
+      url: "https://techcertguide.blog/automatic-sensitivity-labels-in-microsoft-purview/",
+    },
+  ],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-Information-Protection",
+    description: "Sensitivity label taxonomy, manual/auto-labeling and Azure RMS encryption implementation.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Information-Protection",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
+/* 7. Microsoft Purview Records Management */
+/* ------------------------------------------------------------------ */
+
+const purviewRecordsManagement: CaseStudy = {
+  slug: "purview-records-management",
+  title: "Microsoft Purview Records Management",
+  tagline:
+    "Formal lifecycle governance for financial, legal and HR records — Record Labels, File Plan, Disposition Review and Regulatory Records.",
+  category: "Compliance · Governance",
+  hero: false,
+  outcome:
+    "Declared financial records as immutable, centralised records visibility in the File Plan, and added reviewer-approved disposition before deletion.",
+  badges: ["Microsoft Purview", "Records Management", "Record Labels", "Disposition Review", "File Plan"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "2–4 weeks",
+  certifications: ["MS-102", "SC-400"],
+  executiveSummary: [
+    "This project deployed Microsoft Purview Records Management for a regulated organisation requiring formal lifecycle governance over financial, legal and HR records, establishing record declaration controls, immutable record protection, structured disposition workflows and centralised records visibility through the File Plan.",
+    "Records Management extends standard retention with record-level controls that prevent modification, enforce chain-of-custody, and satisfy regulatory obligations such as ISO 15489, GDPR Article 5 and SEC Rule 17a-4.",
+  ],
+  businessProblem: {
+    problem:
+      "Financial records could be modified or deleted before their retention period expired, there was no centralised visibility into retention labels across workloads, legal hold coverage was inadequate for declared records, and content was disposed of without review or approval.",
+    importance:
+      "Regulated organisations must be able to prove that financial, legal and HR records were preserved, protected and disposed of correctly. Without record-level controls, the organisation cannot demonstrate this to auditors or in litigation.",
+    risks: [
+      "Financial records modified or deleted before retention period expires",
+      "No centralised visibility into retention labels across workloads",
+      "Legal hold inadequate for declared records during litigation",
+      "Disposition of records without review or approval",
+    ],
+    compliance: [
+      "ISO 15489 records management principles",
+      "GDPR Article 5 storage limitation and integrity requirements",
+      "SEC Rule 17a-4 style immutable record-keeping obligations",
+    ],
+  },
+  solutionOverview: [
+    "A record label (MS102-Finance-Record) was created with a 7-year retention period and the \"Mark items as a record\" setting enabled, converting a standard retention label into a Record Label with enhanced governance controls, then published to Exchange Online, SharePoint Online and OneDrive.",
+    "The File Plan provides a single, centralised view of all record labels, retention durations and disposition settings, while Disposition Review assigns reviewers who must approve permanent deletion once the retention period lapses — closing the gap where records could previously be deleted without oversight.",
+  ],
+  architectureCaption:
+    "Record Labels, File Plan and Disposition Review operating together over Exchange Online, SharePoint Online, OneDrive and Teams, giving centralised visibility and reviewer-approved disposition for declared records.",
+  technologyStack: [
+    { name: "Microsoft Purview Records Management", description: "Record declaration, File Plan and disposition workflow" },
+    { name: "Record Labels", description: "\"Mark items as a record\" retention labels with enhanced governance" },
+    { name: "Regulatory Record Labels", description: "Highest-level protection — cannot be removed once applied" },
+    { name: "Disposition Review", description: "Reviewer approval workflow before permanent deletion" },
+    { name: "Event-Based Retention", description: "Contract and legal document retention triggered by an event" },
+    { name: "PowerShell / Microsoft Graph", description: "Record label reporting and File Plan export" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "Patchthecloud.onmicrosoft.com" },
+    { label: "Admin Portal", value: "compliance.microsoft.com" },
+    { label: "Licensing", value: "Microsoft 365 E5" },
+    { label: "Workloads", value: "Exchange Online, SharePoint Online, OneDrive, Teams" },
+    { label: "Scope", value: "Organisation-wide + Finance adaptive scope" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Enable Records Management",
+      description: "Confirm Records Management is enabled for the tenant.",
+      steps: [
+        "Navigate to compliance.microsoft.com → Solutions → Records Management",
+        "Confirm the solution is enabled",
+        "Review existing retention label estate before adding record labels",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Create Record Labels",
+      description: "Create the MS102-Finance-Record label with the record declaration setting enabled.",
+      steps: [
+        "Create a retention label with a 7-year retention period and Retain-and-Delete action",
+        "Enable \"Mark items as a record\"",
+        "Publish the label policy to Exchange Online, SharePoint Online and OneDrive",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Configure File Plan",
+      description: "Review all record labels centrally via the File Plan.",
+      steps: [
+        "Navigate to Records Management → File Plan",
+        "Review label status, retention duration and disposition action",
+        "Confirm Is Record = Yes for MS102-Finance-Record",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Event-Based Retention",
+      description: "Extend coverage to contract and legal document categories.",
+      steps: [
+        "Review candidate categories for event-based retention",
+        "Plan event triggers for contract expiry and legal matters",
+        "Document scope for future rollout",
+      ],
+    },
+    {
+      phase: "Phase 5",
+      title: "Disposition Review",
+      description: "Assign reviewers who must approve deletion after retention expires.",
+      steps: [
+        "Navigate to Records Management → Disposition",
+        "Assign disposition reviewers to record labels",
+        "Confirm approval workflow is active before content reaches disposition",
+      ],
+    },
+    {
+      phase: "Phase 6",
+      title: "Regulatory Records & Validation",
+      description: "Evaluate Regulatory Records for the highest-sensitivity categories and validate the configuration.",
+      steps: [
+        "Review Regulatory Record behaviour (cannot be removed by admins once applied)",
+        "Validate File Plan and disposition configuration end to end",
+        "Export configuration evidence for compliance reporting",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Export all record labels",
+      language: "powershell",
+      filename: "Get-RecordLabels.ps1",
+      code: `# Illustrative scaffold based on Get-RecordLabels.ps1
+Connect-IPPSSession -UserPrincipalName admin@patchthecloud.onmicrosoft.com
+.\\scripts\\Get-RecordLabels.ps1 -OutputPath ".\\reports\\record-labels.csv"`,
+    },
+    {
+      title: "Export the full File Plan",
+      language: "powershell",
+      filename: "Export-FilePlan.ps1",
+      code: `# Illustrative scaffold based on Export-FilePlan.ps1
+Get-ComplianceTag | Select-Object Name, RetentionDuration, IsRecordLabel, RetentionAction |
+  Export-Csv -Path .\\reports\\file-plan.csv -NoTypeInformation`,
+    },
+    {
+      title: "Audit Records Management configuration",
+      language: "powershell",
+      filename: "Get-RecordsManagementConfiguration.ps1",
+      code: `# Illustrative scaffold based on Get-RecordsManagementConfiguration.ps1
+Get-CompliancePolicy | Where-Object Name -like "*Record*" |
+  Select-Object Name, Enabled, Mode`,
+    },
+  ],
+  screenshots: [
+    ...shots("Phase 2 · Record Labels", [
+      ["Records Management Solution", "Navigating to the Records Management solution in the Purview compliance portal.", "/projects/purview-records-management/screenshots/02-record-labels/02-enable-audit__01-purview-audit-solution.png"],
+      ["Mark as Record Setting", "Enabling the \"Mark items as a record\" setting when creating a retention label.", "/projects/purview-records-management/screenshots/02-record-labels/02-record-labels__01-mark-as-record-setting.png"],
+      ["Label Policies Published", "MS102-Finance-Record label published across Microsoft 365 workloads.", "/projects/purview-records-management/screenshots/02-record-labels/02-record-labels__02-label-policies-published.png"],
+    ]),
+    ...shots("Phase 3 · File Plan", [
+      ["File Plan Configuration", "Configuring the File Plan view for record labels and retention settings.", "/projects/purview-records-management/screenshots/03-file-plan/03-audit-search__01-search-configuration.png"],
+      ["File Plan Loading", "File Plan view populating with record label configuration.", "/projects/purview-records-management/screenshots/03-file-plan/03-audit-search__02-search-in-progress.png"],
+      ["File Plan Loaded", "File Plan view fully loaded with record label details.", "/projects/purview-records-management/screenshots/03-file-plan/03-audit-search__03-search-completed.png"],
+      ["File Plan Overview", "Centralised File Plan view showing record labels, retention durations and disposition settings.", "/projects/purview-records-management/screenshots/03-file-plan/03-file-plan__01-file-plan-overview.png"],
+    ]),
+    ...shots("Phase 4 · Event-Based Retention", [
+      ["Event-Based Retention Review", "Reviewing event-based retention configuration for contract and legal document categories.", "/projects/purview-records-management/screenshots/04-event-based-retention/04-investigation__01-audit-results.png"],
+    ]),
+    ...shots("Phase 5 · Disposition Review", [
+      ["Disposition Export In Progress", "Exporting disposition review configuration for the reviewer approval workflow.", "/projects/purview-records-management/screenshots/05-disposition-review/05-export-results__01-export-in-progress.png"],
+      ["Disposition Export Complete", "Disposition review export completed for records requiring reviewer approval.", "/projects/purview-records-management/screenshots/05-disposition-review/05-export-results__02-export-complete.png"],
+    ]),
+    ...shots("Phase 6 · Regulatory Records & Validation", [
+      ["Regulatory Records Validation", "Validating regulatory record configuration and export in Excel.", "/projects/purview-records-management/screenshots/06-regulatory-records/06-validation__01-audit-export-excel.png"],
+    ]),
+  ],
+  validation: [
+    { item: "Record Visible in File Plan", detail: "MS102-Finance-Record appears with Is Record = Yes." },
+    { item: "Published to All Workloads", detail: "Record label policy visible across Exchange, SharePoint and OneDrive." },
+    { item: "Modification Prevented", detail: "Editing is blocked on declared record items." },
+    { item: "File Plan Completeness", detail: "Duration, action and record type all visible centrally." },
+    { item: "Disposition Configured", detail: "Reviewer assigned; approval workflow active." },
+    { item: "Regulatory Record Immutability", detail: "Label removal blocked by administrators once applied." },
+  ],
+  challenges: [
+    {
+      title: "Publishing is not the same as applying",
+      detail: "Publishing a record label makes it available to users; it does not automatically apply the label to existing content — auto-apply policies are required for that.",
+    },
+    {
+      title: "Regulatory Records cannot be undone",
+      detail: "Unlike standard Record Labels, Regulatory Records cannot be removed by administrators once applied, so they were thoroughly tested before any production consideration.",
+    },
+  ],
+  lessons: [
+    "Publishing ≠ applying — auto-apply policies are required to label existing content, not just new content.",
+    "The \"Unlock this record by default\" option is useful during drafting phases before formally locking a record.",
+    "The File Plan is read-only in Records Management; configuration changes are made in Data Lifecycle Management.",
+    "Disposition review workflows require Microsoft 365 E5 or the Compliance add-on.",
+  ],
+  businessImpact: [
+    { label: "Immutable Records", value: "Record Labels enforced", icon: "shield" },
+    { label: "Centralised Visibility", value: "File Plan", icon: "compliance" },
+    { label: "Governed Disposition", value: "Reviewer approval", icon: "risk" },
+    { label: "Administrative Efficiency", value: "PowerShell reporting", icon: "efficiency" },
+  ],
+  skills: [
+    "Microsoft Purview Records Management",
+    "Record Label & File Plan Design",
+    "Disposition Review Workflows",
+    "Event-Based Retention",
+    "Regulatory Records",
+    "PowerShell / Microsoft Graph",
+  ],
+  relatedCertifications: ["MS-102", "SC-400"],
+  blogArticles: [
+    {
+      title: "Records Management in Microsoft Purview",
+      description: "Record Labels, File Plan and disposition review walkthrough.",
+      url: "https://techcertguide.blog/records-management-in-microsoft-purview/",
+    },
+  ],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-Records-Management",
+    description: "Record Labels, File Plan, Disposition Review and Regulatory Records implementation.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Records-Management",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
+/* 8. Microsoft Purview Audit */
+/* ------------------------------------------------------------------ */
+
+const purviewAudit: CaseStudy = {
+  slug: "purview-audit",
+  title: "Microsoft Purview Audit",
+  tagline:
+    "Unified Audit Log search, insider-threat investigation and evidence export across Microsoft 365.",
+  category: "Compliance · Investigation",
+  hero: false,
+  outcome:
+    "Investigated a focused file-access pattern to 12 audit events and produced a chain-of-custody CSV export for compliance evidence.",
+  badges: ["Microsoft Purview", "Unified Audit Log", "Investigation", "Compliance Reporting"],
+  difficulty: "Intermediate",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "1–2 weeks",
+  certifications: ["MS-102"],
+  executiveSummary: [
+    "This project documents an enterprise Microsoft Purview Audit implementation — verifying audit is enabled, running a targeted audit search, investigating a focused insider-threat scenario, and exporting evidence for compliance and forensic use.",
+    "Using Audit (Standard), a search scoped to a single user, activity type and three-day window returned 12 FileAccessed events, which were reviewed, exported to CSV with full AuditData JSON, and validated in Excel — demonstrating a repeatable, evidence-producing investigation workflow.",
+  ],
+  businessProblem: {
+    problem:
+      "There was no visibility into who accessed sensitive SharePoint documents, no accountability record for file deletions, no systematic review of privileged account actions, and security incidents were investigated reactively without data.",
+    importance:
+      "Regulatory auditors require evidence of monitoring controls; without a searchable, exportable audit trail the organisation cannot demonstrate accountability or respond quickly to a suspected incident.",
+    risks: [
+      "No visibility into who accessed sensitive SharePoint documents",
+      "File deletions occur with no accountability record",
+      "Privileged account actions not reviewed systematically",
+      "Security incidents investigated reactively, without data",
+    ],
+    compliance: [
+      "ISO/IEC 27001:2022 monitoring and logging controls",
+      "GDPR Article 5 accountability requirements",
+      "Evidence retention for regulatory audits",
+    ],
+  },
+  solutionOverview: [
+    "Microsoft Purview Audit (Standard) centralises activity from Exchange Online, SharePoint Online, OneDrive, Teams and Entra ID into the Unified Audit Log, searchable by date range, user, activity type and workload.",
+    "A targeted investigation scenario — a single test user's FileAccessed activity over a three-day window — was executed end to end: search, results review, CSV export with full AuditData JSON, and validation of the export in Excel, producing chain-of-custody evidence ready for compliance or legal use.",
+  ],
+  architectureCaption:
+    "Activity from Exchange, SharePoint, OneDrive, Teams and Entra ID flows into the Unified Audit Log, searchable via Audit Search and exportable to CSV for investigation and compliance evidence.",
+  technologyStack: [
+    { name: "Microsoft Purview Audit", description: "Unified Audit Log search, filters and export" },
+    { name: "Audit Standard", description: "90-day retention, full search, CSV export (E3/E5)" },
+    { name: "Exchange Online / SharePoint / OneDrive / Teams", description: "Audited Microsoft 365 workloads" },
+    { name: "Microsoft Entra ID", description: "Administrator authentication and audit role assignment" },
+    { name: "PowerShell", description: "Targeted search, bulk export and configuration auditing" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "securem365lsb.onmicrosoft.com (Microsoft 365 E5 trial)" },
+    { label: "Audit Tier", value: "Audit Standard" },
+    { label: "Test Account", value: "testuser1@securem365lsb.onmicrosoft.com" },
+    { label: "Investigation Window", value: "2026-07-01 to 2026-07-03" },
+    { label: "Investigation Scenario", value: "Insider Threat — file access pattern analysis" },
+    { label: "Events Captured", value: "12 FileAccessed events" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Enable & Verify Audit",
+      description: "Confirm auditing is enabled and administrator roles are assigned.",
+      steps: [
+        "Navigate to compliance.microsoft.com → Solutions → Audit",
+        "Confirm auditing status is enabled for the tenant",
+        "Verify Audit Logs / View-Only Audit Logs roles are assigned",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Configure Audit Search",
+      description: "Scope the search by date range, user and activity type.",
+      steps: [
+        "Set the date range to 2026-07-01 – 2026-07-03",
+        "Scope the activity to FileAccessed",
+        "Scope the user to testuser1 and record type to SharePointFileOperation",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Execute & Investigate",
+      description: "Run the search and review returned events.",
+      steps: [
+        "Submit the search and monitor asynchronous progress",
+        "Confirm 12 audit records returned",
+        "Review Date, User, Activity, Record Type and IP Address per event",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Export Evidence",
+      description: "Export matching events to CSV with full AuditData JSON.",
+      steps: [
+        "Select Export Results",
+        "Confirm CSV export includes RecordId, CreationDate, RecordType, Operation, UserId and AuditData",
+        "Preserve the export for chain-of-custody evidence",
+      ],
+    },
+    {
+      phase: "Phase 5",
+      title: "Validate",
+      description: "Validate the exported CSV for completeness in Excel.",
+      steps: [
+        "Open the export in Excel",
+        "Confirm all 12 events are present with full audit context",
+        "Confirm AuditData JSON includes session IDs and client app details",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Targeted Unified Audit Log search",
+      language: "powershell",
+      filename: "Search-UnifiedAuditLog.ps1",
+      code: `# Illustrative scaffold based on Search-UnifiedAuditLog.ps1
+.\\Search-UnifiedAuditLog.ps1 \`
+  -StartDate "2026-07-01" \`
+  -EndDate "2026-07-03" \`
+  -UserIds "testuser1@securem365lsb.onmicrosoft.com" \`
+  -Operations "FileAccessed" \`
+  -OutputPath "C:\\AuditExports"`,
+    },
+    {
+      title: "Bulk audit export",
+      language: "powershell",
+      filename: "Export-AuditLogs.ps1",
+      code: `# Illustrative scaffold based on Export-AuditLogs.ps1
+Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-3) -EndDate (Get-Date) \`
+  -RecordType SharePointFileOperation |
+  Export-Csv -Path .\\AuditExports\\audit-export.csv -NoTypeInformation`,
+    },
+  ],
+  screenshots: [
+    ...shots("Phase 2–3 · Audit Search", [
+      ["Search Configuration", "Configuring the audit search — date range, activities, users and record types.", "/projects/purview-audit/screenshots/03-audit-search/02-audit-search_01-search-configuration.png.png"],
+      ["Search Completed", "Audit search completed — 12 matching FileAccessed events returned.", "/projects/purview-audit/screenshots/03-audit-search/02-audit-search_02-search-completed.png.png"],
+      ["Search Results", "Reviewing the 12 returned audit events for testuser1.", "/projects/purview-audit/screenshots/03-audit-search/03-audit-results_01-search-results.png.png"],
+    ]),
+    ...shots("Phase 4 · Export Results", [
+      ["Export In Progress", "Exporting the matching audit events to CSV for evidence preservation.", "/projects/purview-audit/screenshots/05-export-results/04-export-results_01-export-in-progress.png.png"],
+      ["Export Complete", "CSV export of all 12 audit records completed.", "/projects/purview-audit/screenshots/05-export-results/04-export-results_02-export-completed.png.png"],
+    ]),
+    ...shots("Phase 5 · Validation", [
+      ["Excel Validation", "Validating the exported audit log CSV in Excel — RecordId, CreationDate, Operation and AuditData confirmed.", "/projects/purview-audit/screenshots/06-validation/05-validation_01-exported-audit-log-csv.png.png"],
+    ]),
+  ],
+  validation: [
+    { item: "Audit Solution Accessible", detail: "Audit accessible at compliance.microsoft.com → Solutions → Audit." },
+    { item: "Search Executes with Filters", detail: "Date, user and activity filters apply correctly." },
+    { item: "12 Results Returned", detail: "Search completes with 12 results for testuser1 FileAccessed." },
+    { item: "Results Display Correctly", detail: "Activity, User, IP, Date and RecordType fields all visible." },
+    { item: "Export Succeeds", detail: "Export completes and CSV downloads successfully." },
+    { item: "CSV Validated in Excel", detail: "All 12 records and AuditData JSON confirmed intact." },
+  ],
+  challenges: [
+    {
+      title: "Audit is enabled by default — but must be verified",
+      detail: "Many organisations assume auditing is active without checking; this was verified explicitly before relying on it for an investigation.",
+    },
+    {
+      title: "Search scope affects performance",
+      detail: "Broad date ranges across all users can be slow; scoping to a specific user, activity and date range returned results faster and was easier to analyse.",
+    },
+  ],
+  lessons: [
+    "AuditData JSON is the forensic record — CSV columns are metadata, but AuditData contains the complete activity context.",
+    "Export early — Audit Standard retains logs for only 90 days; preserve evidence immediately once an incident is identified.",
+    "Audit Premium is required for mailbox-read events (MailItemsAccessed), which are critical for email breach investigations.",
+    "Targeted searches (specific user, activity, date range) are faster and easier to analyse than broad searches.",
+  ],
+  businessImpact: [
+    { label: "Investigation Time", value: "12 events in one search", icon: "clock" },
+    { label: "Evidence Preserved", value: "Chain-of-custody CSV", icon: "compliance" },
+    { label: "Improved Accountability", value: "Searchable audit trail", icon: "shield" },
+    { label: "Audit-Ready", value: "ISO 27001 evidence", icon: "risk" },
+  ],
+  skills: [
+    "Microsoft Purview Audit",
+    "Unified Audit Log Investigation",
+    "Insider Threat Analysis",
+    "Evidence Export & Chain of Custody",
+    "PowerShell Audit Automation",
+  ],
+  relatedCertifications: ["MS-102"],
+  blogArticles: [
+    {
+      title: "Microsoft Purview Audit Lab Guide",
+      description: "Audit search, investigation and export walkthrough.",
+      url: "https://techcertguide.blog/microsoft-purview-audit/",
+    },
+  ],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-Audit",
+    description: "Unified Audit Log search, investigation workflow and evidence export implementation.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Audit",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
+/* 9. Microsoft Purview eDiscovery */
+/* ------------------------------------------------------------------ */
+
+const purviewEdiscovery: CaseStudy = {
+  slug: "purview-ediscovery",
+  title: "Microsoft Purview eDiscovery",
+  tagline:
+    "Case-based legal investigation, multi-workload KQL content search and evidence export across Microsoft 365.",
+  category: "Compliance · Investigation",
+  hero: false,
+  outcome:
+    "Stood up a case-based investigation workflow spanning Exchange, SharePoint, OneDrive and Teams, from KQL search through to a structured export package.",
+  badges: ["Microsoft Purview", "eDiscovery", "KQL", "Legal Hold", "Case Management"],
+  difficulty: "Intermediate",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "1–2 weeks",
+  certifications: ["MS-102", "SC-400"],
+  executiveSummary: [
+    "This project implements Microsoft Purview eDiscovery (Standard) for legal and compliance investigations, covering case creation, multi-workload data source configuration, KQL-based content search, results review and structured evidence export.",
+    "A Finance Investigation case was created end to end — spanning Exchange Online, SharePoint Online, OneDrive and Microsoft Teams — demonstrating the full case-based investigation lifecycle required for legal holds, HR investigations and regulatory requests.",
+  ],
+  businessProblem: {
+    problem:
+      "Legal and HR teams had no centralised way to search Exchange, SharePoint, Teams and OneDrive together, no legal hold mechanism to preserve a departing employee's communications, and no structured, exportable evidence workflow for external auditors.",
+    importance:
+      "When legal, HR or regulatory requests arrive with tight deadlines, a manual, per-workload search process is slow, inconsistent, and risks missing evidence — exposing the organisation to sanctions or adverse findings.",
+    risks: [
+      "No centralised search capability across Exchange, SharePoint, Teams and OneDrive",
+      "No legal hold mechanism — account deletion could destroy evidence",
+      "Manual, inconsistent collection risking missed evidence",
+      "No documented, repeatable investigation process for regulators",
+    ],
+    compliance: [
+      "Legal hold and litigation-readiness requirements",
+      "Regulatory evidence production requirements",
+      "Auditable investigation and export workflow",
+    ],
+  },
+  solutionOverview: [
+    "Microsoft Purview eDiscovery (Standard) organises every investigation activity inside a named case, providing role-based access, search history and export jobs in one auditable container.",
+    "A Finance Investigation case was created, data sources across Exchange Online, SharePoint Online, OneDrive and Microsoft Teams were added, and a KQL query combining sender, subject, date range and file-type conditions was built, executed and reviewed before exporting a structured evidence package.",
+  ],
+  architectureCaption:
+    "A named eDiscovery case aggregates search, hold and export activity across Exchange, SharePoint, OneDrive and Teams, producing a structured, auditable evidence package for legal and compliance teams.",
+  technologyStack: [
+    { name: "Microsoft Purview eDiscovery (Standard)", description: "Case management, KQL search and export" },
+    { name: "KQL (Keyword Query Language)", description: "Precise multi-condition search across workloads" },
+    { name: "Exchange Online / SharePoint / OneDrive / Teams", description: "Searched Microsoft 365 data sources" },
+    { name: "Unified Audit Log", description: "Records all case activity for audit evidence" },
+    { name: "PowerShell", description: "Case creation, inventory and export automation" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "Microsoft 365 E5 Trial" },
+    { label: "eDiscovery Tier", value: "eDiscovery Standard" },
+    { label: "Case Name", value: "Finance Investigation" },
+    { label: "Data Sources", value: "Exchange Online, SharePoint Online, OneDrive, Microsoft Teams" },
+    { label: "Search Type", value: "KQL (Keyword Query Language)" },
+    { label: "Export Format", value: "Evidence package (PST / CSV)" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Enable eDiscovery",
+      description: "Confirm eDiscovery access and the investigator's role assignment.",
+      steps: [
+        "Navigate to compliance.microsoft.com → Solutions → eDiscovery",
+        "Confirm eDiscovery (Standard) is available",
+        "Assign the eDiscovery Manager role — not granted automatically to Global Admins",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Create Investigation Case",
+      description: "Create a named case to contain all investigation activity.",
+      steps: [
+        "Select Create a case",
+        "Name the case \"Finance Investigation\" with a description",
+        "Confirm the case appears in the cases list",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Configure Data Sources & Build KQL Search",
+      description: "Add data sources and build a targeted KQL query.",
+      steps: [
+        "Add Exchange Online, SharePoint Online, OneDrive and Teams as sources",
+        "Build a KQL query combining keyword, sender, subject, date and file-type conditions",
+        "Run the query and review the estimated item count and data size",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Export Evidence",
+      description: "Export matching content as a structured evidence package.",
+      steps: [
+        "Select Export Results",
+        "Choose export scope (all items vs. excluding unindexed/encrypted items)",
+        "Deliver the structured package (PST + manifest) to the legal team",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Create an eDiscovery case",
+      language: "powershell",
+      filename: "New-eDiscoveryCase.ps1",
+      code: `# Illustrative scaffold based on New-eDiscoveryCase.ps1
+.\\New-eDiscoveryCase.ps1 \`
+  -CaseName "Finance Investigation" \`
+  -Description "Finance-related emails and documents investigation" \`
+  -Members "investigator@yourtenant.onmicrosoft.com"`,
+    },
+    {
+      title: "List eDiscovery cases",
+      language: "powershell",
+      filename: "Get-eDiscoveryCases.ps1",
+      code: `# Illustrative scaffold based on Get-eDiscoveryCases.ps1
+Get-ComplianceCase | Select-Object Name, Status, CreatedDateTime`,
+    },
+  ],
+  screenshots: [
+    ...shots("Phase 1 · Overview", [
+      ["eDiscovery Solutions Menu", "eDiscovery entry point in the Microsoft Purview Solutions menu.", "/projects/purview-ediscovery/screenshots/01-overview/01-overview__01-ediscovery-solutions-menu.png"],
+    ]),
+    ...shots("Phase 2 · Create Case", [
+      ["eDiscovery Cases Page", "The eDiscovery cases list before the new case is created.", "/projects/purview-ediscovery/screenshots/02-create-case/02-create-case__01-ediscovery-cases-page.png"],
+      ["Create Case Form", "Naming and describing the Finance Investigation case.", "/projects/purview-ediscovery/screenshots/02-create-case/02-create-case__02-create-case-form.png"],
+      ["Case Created", "Finance Investigation confirmed in the cases list.", "/projects/purview-ediscovery/screenshots/02-create-case/02-create-case__03-case-created-list.png"],
+    ]),
+    ...shots("Phase 3 · Content Search", [
+      ["Add Sources Button", "Adding data sources to the Finance Investigation search.", "/projects/purview-ediscovery/screenshots/04-content-search/04-content-search__01-add-sources-button.png"],
+      ["Data Source Selection", "Selecting Exchange, SharePoint, OneDrive and Teams as search locations.", "/projects/purview-ediscovery/screenshots/04-content-search/04-content-search__02-data-source-selection.png"],
+      ["Search Condition Builder", "Building the KQL query with keyword, sender, subject and date conditions.", "/projects/purview-ediscovery/screenshots/04-content-search/04-content-search__03-search-condition-builder.png"],
+      ["Search Results", "Estimated item count and data size after running the query.", "/projects/purview-ediscovery/screenshots/04-content-search/04-content-search__04-search-results.png"],
+    ]),
+    ...shots("Phase 4 · Export Results", [
+      ["Export Screen", "Configuring the evidence export package for legal team delivery.", "/projects/purview-ediscovery/screenshots/06-export-results/06-export-results__01-export-screen.png"],
+    ]),
+  ],
+  validation: [
+    { item: "eDiscovery Accessible", detail: "Solution accessible at compliance.microsoft.com with the Manager role assigned." },
+    { item: "Case Created", detail: "Finance Investigation case created and visible in the cases list." },
+    { item: "Data Sources Added", detail: "Exchange, SharePoint, OneDrive and Teams added to the search." },
+    { item: "KQL Search Executed", detail: "Search configured and executed successfully." },
+    { item: "Results Reviewed", detail: "0 items returned — expected behaviour in a low-activity test tenant." },
+    { item: "Export Accessible", detail: "Export screen accessed with configuration options available." },
+  ],
+  challenges: [
+    {
+      title: "eDiscovery Manager role not automatic",
+      detail: "Global Administrators are not automatically granted the eDiscovery Manager role — it must be assigned explicitly before a case can be created.",
+    },
+    {
+      title: "Empty results in a test tenant",
+      detail: "The content search returned 0 matching items, which is expected behaviour in a newly provisioned tenant with minimal sample data — the workflow itself is unaffected.",
+    },
+  ],
+  lessons: [
+    "Always run content searches inside a case — searching outside a case provides no investigation audit trail.",
+    "KQL precision (sender, subject, date range, file type) prevents scope creep from broad keyword-only searches.",
+    "Use Microsoft Edge for the eDiscovery export function; some export integrations are unreliable in other browsers.",
+    "Test tenants with minimal activity will legitimately return 0 results — this does not indicate misconfiguration.",
+  ],
+  businessImpact: [
+    { label: "Unified Investigation", value: "4 workloads, 1 case", icon: "efficiency" },
+    { label: "Litigation Readiness", value: "Structured export", icon: "compliance" },
+    { label: "Audit Trail", value: "Case-based activity log", icon: "shield" },
+    { label: "Reduced Risk", value: "Repeatable process", icon: "risk" },
+  ],
+  skills: [
+    "Microsoft Purview eDiscovery",
+    "Case Management",
+    "KQL Query Design",
+    "Evidence Export & Legal Hold Concepts",
+    "PowerShell Automation",
+  ],
+  relatedCertifications: ["MS-102", "SC-400"],
+  blogArticles: [
+    {
+      title: "eDiscovery in Microsoft Purview Lab Guide",
+      description: "Case creation, KQL search and export walkthrough.",
+      url: "https://techcertguide.blog/ediscovery-in-microsoft-purview/",
+    },
+  ],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-eDiscovery",
+    description: "Case-based eDiscovery investigation — KQL content search and evidence export implementation.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-eDiscovery",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
+/* 10. Microsoft Purview Data Lifecycle Management */
+/* ------------------------------------------------------------------ */
+
+const purviewDlm: CaseStudy = {
+  slug: "purview-dlm",
+  title: "Microsoft Purview Data Lifecycle Management",
+  tagline:
+    "Organisation-wide retention policies with static scope, plus item-level retention labels targeted via adaptive scope.",
+  category: "Compliance · Governance",
+  hero: false,
+  outcome:
+    "Enforced a 7-year baseline retention policy tenant-wide and published an item-level Finance record label dynamically to Finance-department users.",
+  badges: ["Microsoft Purview", "Retention Policies", "Retention Labels", "Adaptive Scope"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "2–3 weeks",
+  certifications: ["MS-102"],
+  executiveSummary: [
+    "This project implements Microsoft Purview Data Lifecycle Management, combining an organisation-wide retention policy with static scope and an item-level retention label targeted dynamically to Finance-department users via an adaptive scope query.",
+    "The result is a baseline governance layer — a 7-year retain-then-delete policy across Exchange, SharePoint, OneDrive, Teams and Microsoft 365 Groups — with a Finance-specific record label published on top for content that needs different, item-level retention treatment.",
+  ],
+  businessProblem: {
+    problem:
+      "Data accumulated across Microsoft 365 without a formal lifecycle framework, creating regulatory exposure for records that must be retained for defined periods, storage and cost inefficiency from data retained indefinitely, GDPR liability from over-retained personal data, and inconsistent governance dependent on individual users remembering to act.",
+    importance:
+      "Regulations such as APRA, FCA and SEC guidance require specific retention periods for financial records; compliance cannot be built on individual memory, and it must scale to the entire organisation without manual per-user configuration.",
+    risks: [
+      "Regulatory exposure from records not retained for required periods",
+      "Storage and cost inefficiency from unmanaged data accumulation",
+      "GDPR liability from personal data retained beyond its need",
+      "Inconsistent governance dependent on individual user action",
+    ],
+    compliance: [
+      "Financial record retention obligations (7-year baseline)",
+      "GDPR data minimisation and storage limitation",
+      "Consistent, auditable retention evidence",
+    ],
+  },
+  solutionOverview: [
+    "A tenant-wide retention policy (MS102-Retention-Policy) was configured with static scope covering Exchange Online, SharePoint Online, OneDrive, Microsoft Teams and Microsoft 365 Groups, retaining and then deleting content after 7 years as the organisational baseline.",
+    "On top of that baseline, a retention label (MS102-Finance-Record, also 7 years, retain-then-delete) was published specifically to Finance department users via an adaptive scope querying the Department attribute — meaning new Finance users are automatically included without manual list maintenance. When both a policy and a label apply to the same content, the longer, more protective retention period wins.",
+  ],
+  architectureCaption:
+    "A static-scope retention policy sets the organisation-wide 7-year baseline across all core workloads, while a retention label published via an adaptive scope (Department = Finance) applies item-level retention to Finance content specifically.",
+  architectureImage: "/projects/purview-dlm/screenshots/02-architecture-diagram.avif",
+  technologyStack: [
+    { name: "Microsoft Purview Data Lifecycle Management", description: "Retention policies, labels and adaptive scopes" },
+    { name: "Retention Policies (Static Scope)", description: "Organisation-wide baseline retention across workloads" },
+    { name: "Retention Labels", description: "Item-level retention control layered on top of the baseline" },
+    { name: "Adaptive Scopes", description: "Attribute-driven, dynamic targeting (Department = Finance)" },
+    { name: "PowerShell / Microsoft Graph", description: "Policy auditing, label export and adaptive scope publishing" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "Patchthecloud.onmicrosoft.com" },
+    { label: "Portal", value: "purview.microsoft.com" },
+    { label: "Retention Policy", value: "MS102-Retention-Policy — 7 years, static scope" },
+    { label: "Retention Label", value: "MS102-Finance-Record — 7 years, adaptive scope" },
+    { label: "Adaptive Scope", value: "Finance Users — Department = Finance" },
+    { label: "Workloads", value: "Exchange, SharePoint, OneDrive, Teams, M365 Groups" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Overview & Portal Navigation",
+      description: "Review the Data Lifecycle Management solution and plan static vs. adaptive scope usage.",
+      steps: [
+        "Review the Purview portal and Data Lifecycle Management solution",
+        "Decide where static scope (organisation baseline) applies vs. item-level labels",
+        "Review the workflow and architecture reference diagrams",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Retention Policy — Static Scope",
+      description: "Create and publish MS102-Retention-Policy across all core workloads.",
+      steps: [
+        "Name the policy and confirm static scope",
+        "Select Exchange, SharePoint, OneDrive, Teams and M365 Groups as covered workloads",
+        "Configure a 7-year retain-then-delete retention period and publish",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Retention Labels",
+      description: "Create MS102-Finance-Record for item-level Finance record retention.",
+      steps: [
+        "Name the label and select its retention type",
+        "Configure a 7-year retain-then-delete retention action",
+        "Review record declaration settings (left disabled for this foundational lab)",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Adaptive Scope & Label Policy",
+      description: "Publish the Finance label dynamically using an adaptive scope query.",
+      steps: [
+        "Create the Finance Users adaptive scope (Department = Finance)",
+        "Publish the label policy to Exchange, SharePoint and OneDrive via the adaptive scope",
+        "Review and confirm the label policy before publishing",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Audit retention policies",
+      language: "powershell",
+      filename: "Get-RetentionPolicies.ps1",
+      code: `# Illustrative scaffold based on Get-RetentionPolicies.ps1
+Get-RetentionCompliancePolicy | Select-Object Name, Enabled, Mode, RetentionRuleTypes`,
+    },
+    {
+      title: "Export retention label inventory",
+      language: "powershell",
+      filename: "Export-RetentionLabels.ps1",
+      code: `# Illustrative scaffold based on Export-RetentionLabels.ps1
+Get-ComplianceTag | Select-Object Name, RetentionDuration, RetentionAction, IsRecordLabel |
+  Export-Csv -Path .\\reports\\retention-labels.csv -NoTypeInformation`,
+    },
+    {
+      title: "Publish retention labels via adaptive scope",
+      language: "powershell",
+      filename: "Publish-RetentionLabels.ps1",
+      code: `# Illustrative scaffold based on Publish-RetentionLabels.ps1
+New-AdaptiveScope -Name "Finance Users" -PolicyType User -LocationRule \`
+  (New-AdaptiveScopeLocationRule -QueryString "Department -eq 'Finance'")
+
+New-RetentionCompliancePolicy -Name "Finance Label Policy" \`
+  -AdaptiveScopeLocation "Finance Users"`,
+    },
+  ],
+  screenshots: [
+    ...shots("Phase 1 · Overview & Workflow", [
+      ["Purview Portal Home", "Microsoft Purview compliance portal landing page.", "/projects/purview-dlm/screenshots/01-overview__01-purview-portal-home.avif"],
+      ["Solutions Navigation", "Navigating the Purview Solutions menu toward Data Lifecycle Management.", "/projects/purview-dlm/screenshots/01-overview__02-information-protection-solution.avif"],
+      ["Portal Navigation", "Navigating within the compliance portal toward retention policies and labels.", "/projects/purview-dlm/screenshots/01-overview__03-sensitivity-labels-navigation.avif"],
+      ["Workflow Diagram", "End-to-end workflow diagram covering retention policy and label lifecycle.", "/projects/purview-dlm/screenshots/03-workflow-diagram.avif"],
+    ]),
+    ...shots("Phase 2 · Retention Policy — Static Scope", [
+      ["DLM Navigation", "Navigating to Data Lifecycle Management in the compliance portal.", "/projects/purview-dlm/screenshots/04-dlm-navigation.avif"],
+      ["Create Policy Wizard", "Starting the retention policy creation wizard.", "/projects/purview-dlm/screenshots/05-create-policy-wizard.avif"],
+      ["Policy Naming & Scope", "Naming MS102-Retention-Policy and confirming static scope.", "/projects/purview-dlm/screenshots/06-policy-naming-scope.avif"],
+      ["Workload Selection", "Selecting Exchange, SharePoint, OneDrive, Teams and M365 Groups as covered workloads.", "/projects/purview-dlm/screenshots/07-workload-selection.avif"],
+      ["Retention Settings", "Configuring a 7-year retain-then-delete retention period.", "/projects/purview-dlm/screenshots/08-retention-settings.avif"],
+      ["Review & Publish", "Final review before publishing the retention policy.", "/projects/purview-dlm/screenshots/09-review-publish.avif"],
+      ["Policy Deployed", "MS102-Retention-Policy deployed and showing Enabled (Pending) status.", "/projects/purview-dlm/screenshots/10-policy-deployed.avif"],
+    ]),
+    ...shots("Phase 3 · Retention Labels", [
+      ["Retention Labels Overview", "Retention labels area of the Data Lifecycle Management solution.", "/projects/purview-dlm/screenshots/11-featured-retention-labels.avif"],
+      ["Label Architecture", "Architecture reference for retention label configuration.", "/projects/purview-dlm/screenshots/12-labels-architecture-diagram.avif"],
+      ["Labels Navigation", "Navigating to retention labels within Data Lifecycle Management.", "/projects/purview-dlm/screenshots/13-dlm-labels-navigation.avif"],
+      ["Create Label — Name", "Naming the MS102-Finance-Record retention label.", "/projects/purview-dlm/screenshots/14-create-label-name.avif"],
+      ["Retention Type", "Selecting the retention type for the Finance record label.", "/projects/purview-dlm/screenshots/15-retention-settings-type.avif"],
+      ["7-Year Retention Period", "Setting a 7-year retention period on the label.", "/projects/purview-dlm/screenshots/16-retention-period-7years.avif"],
+      ["Retain and Delete", "Configuring the Retain-then-Delete retention action.", "/projects/purview-dlm/screenshots/17-retain-and-delete.avif"],
+      ["Review Record Settings", "Reviewing record declaration settings before publishing the label.", "/projects/purview-dlm/screenshots/18-review-record-settings.avif"],
+    ]),
+    ...shots("Phase 4 · Adaptive Scope & Label Policy", [
+      ["Publish Label Policy — Start", "Beginning the process to publish the Finance retention label policy.", "/projects/purview-dlm/screenshots/03-label-policies__01-publish-label-start.avif"],
+      ["Publish Label Policy", "Publishing the MS102-Finance-Record label policy.", "/projects/purview-dlm/screenshots/19-publish-label-start.avif"],
+      ["Publish Locations", "Selecting Exchange Online, SharePoint Online and OneDrive as publish locations.", "/projects/purview-dlm/screenshots/20-publish-locations.avif"],
+      ["Adaptive Scope Configuration", "Configuring the Finance Users adaptive scope query.", "/projects/purview-dlm/screenshots/21-adaptive-scope-config.avif"],
+      ["Adaptive Scope Details", "Department = Finance adaptive scope query details.", "/projects/purview-dlm/screenshots/22-adaptive-scope-details.avif"],
+      ["Label Policy Name", "Naming the Finance label policy.", "/projects/purview-dlm/screenshots/23-label-policy-name.avif"],
+      ["Label Policy Review", "Final review of the Finance label policy before publishing.", "/projects/purview-dlm/screenshots/24-label-policy-review.avif"],
+    ]),
+  ],
+  validation: [
+    { item: "Retention Policy Deployed", detail: "MS102-Retention-Policy shows Enabled (Pending) across all configured workloads." },
+    { item: "Retention Label Created", detail: "MS102-Finance-Record created with a 7-year retain-then-delete action." },
+    { item: "Adaptive Scope Active", detail: "Finance Users adaptive scope dynamically includes Department = Finance users." },
+    { item: "Label Policy Published", detail: "Finance label policy published to Exchange, SharePoint and OneDrive." },
+    { item: "Most Protective Wins", detail: "Confirmed the longer retention period applies when policy and label overlap." },
+  ],
+  challenges: [
+    {
+      title: "Adaptive scopes depend on clean Entra ID attributes",
+      detail: "The Finance Users adaptive scope queries Department = Finance; users without this attribute populated are silently excluded from the scope.",
+    },
+    {
+      title: "Propagation takes time",
+      detail: "Both the retention policy and label policy showed Enabled (Pending) immediately after creation — full propagation across all workloads can take several hours, which is expected behaviour, not an error.",
+    },
+  ],
+  lessons: [
+    "Static scope is simpler and equally effective for baseline, organisation-wide policies.",
+    "Publishing a label ≠ applying it — auto-apply policies or manual user action are still required to classify content.",
+    "Adaptive scopes require consistent Entra ID attribute data or users are silently excluded.",
+    "When multiple retention settings apply to the same item, the longer, most protective retention period wins.",
+  ],
+  businessImpact: [
+    { label: "Baseline Governance", value: "7-year org-wide policy", icon: "compliance" },
+    { label: "Dynamic Targeting", value: "Adaptive scope", icon: "efficiency" },
+    { label: "Reduced Storage Risk", value: "Automated disposition", icon: "risk" },
+    { label: "Audit-Ready", value: "Verifiable retention evidence", icon: "shield" },
+  ],
+  skills: [
+    "Microsoft Purview Data Lifecycle Management",
+    "Retention Policy Design (Static Scope)",
+    "Retention Labels (Item-Level Control)",
+    "Adaptive Scopes",
+    "PowerShell / Microsoft Graph",
+  ],
+  relatedCertifications: ["MS-102"],
+  blogArticles: [
+    {
+      title: "Retention Policies in Microsoft Purview",
+      description: "Static-scope, organisation-wide retention policy design.",
+      url: "https://techcertguide.blog/retention-policies-in-microsoft-purview/",
+    },
+    {
+      title: "Retention Labels in Microsoft Purview",
+      description: "Item-level retention labels and adaptive scope publishing.",
+      url: "https://techcertguide.blog/retention-labels-in-microsoft-purview/",
+    },
+  ],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-Data-Lifecycle-Management",
+    description: "Retention policies (static scope) and retention labels (adaptive scope) implementation.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Data-Lifecycle-Management",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
+/* Registry */
 /* ------------------------------------------------------------------ */
 
 export const caseStudies: CaseStudy[] = [
   purviewDlp,
+  purviewInformationProtection,
+  purviewRecordsManagement,
+  purviewAudit,
+  purviewEdiscovery,
+  purviewDlm,
   intuneDeployment,
   zeroTrustDevice,
   entraIdProtection,
