@@ -2315,6 +2315,206 @@ New-RetentionCompliancePolicy -Name "Finance Label Policy" \`
 };
 
 /* ------------------------------------------------------------------ */
+/* 11. Microsoft Purview Data Security Investigations                  */
+/* ------------------------------------------------------------------ */
+
+const purviewDsi: CaseStudy = {
+  slug: "purview-dsi",
+  title: "Microsoft Purview Data Security Investigations",
+  tagline:
+    "AI-powered departing-employee exfiltration investigation — scoped evidence collection, generative AI categorization, natural-language search and deep content examination inside Microsoft Purview.",
+  category: "Compliance · Insider Risk",
+  hero: false,
+  outcome:
+    "Triaged 10 collected files down to the one document containing regulated payment card data and tracked it through to a fully audited mitigation, using Microsoft Purview's generative AI investigation workspace end to end.",
+  badges: ["Microsoft Purview", "Data Security Investigations", "Generative AI", "Insider Risk Management", "SC-400", "SC-200"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Home Lab",
+  implementationTime: "1 week",
+  certifications: ["SC-400", "MS-102", "SC-200"],
+  executiveSummary: [
+    "This project built an end-to-end Microsoft Purview Data Security Investigations (DSI) case modeled on a departing-employee insider-risk scenario, using the built-in \"Surface employee data exfiltration\" template to scope, collect and analyze evidence for a single user.",
+    "Evidence was collected across Exchange/SharePoint (Audit) and Windows endpoint (Endpoint DLP) sources, then run through DSI's generative AI stages: automatic content categorization, natural-language AI Search, and deep AI Examination of the single highest-risk document.",
+    "The investigation traced a confirmed high-risk file — containing nine payment card numbers — from initial collection through AI-assisted triage to a completed entry in the Mitigation list, with every stage logged in a timestamped Activities audit trail.",
+  ],
+  businessProblem: {
+    problem:
+      "A departing employee may access, copy or export confidential company data before their last day, and security teams have no fast way to reconstruct exactly what that employee touched across mailbox and file storage, or what kind of regulated data it actually contains.",
+    importance:
+      "Manually opening and reading every collected file to classify it does not scale, and traditional keyword search can confirm a document exists without revealing what regulated data it holds or at what risk level — a gap that matters most in the narrow window between resignation and exit.",
+    risks: [
+      "Undetected exfiltration of financial, personal or proprietary data by a departing employee",
+      "No structured way to triage which collected files actually contain regulated data types",
+      "Findings escalated to HR or legal without a defensible, auditable evidence trail",
+      "Delayed response caused by manually reviewing every collected item by hand",
+    ],
+    compliance: [
+      "Insider risk / data exfiltration investigation practice",
+      "Auditability and chain-of-custody for HR and legal handoff",
+      "Regulated data identification (payment card and personal data)",
+    ],
+  },
+  solutionOverview: [
+    "The investigation was built using Microsoft Purview's \"Surface employee data exfiltration\" template, scoped to a single departing user's mailbox and SharePoint/OneDrive sites, then carried through AI categorization, natural-language search, targeted AI examination and mitigation tracking inside one investigation workspace.",
+  ],
+  architectureCaption:
+    "Audit and Endpoint DLP evidence sources feed a single DSI investigation workspace, where Categorize, AI Search and Examine progressively narrow the evidence set down to a confirmed high-risk file tracked through the Mitigation list.",
+  technologyStack: [
+    { name: "Microsoft Purview Data Security Investigations", description: "Generative AI-powered investigation workspace — Identify, Analyze, Mitigate" },
+    { name: "Audit (Unified Audit Log)", description: "Exchange, SharePoint and OneDrive evidence collection source" },
+    { name: "Endpoint DLP", description: "Data-loss activity evidence from managed Windows devices" },
+    { name: "Categorize with AI", description: "Generative AI classifier assigning content categories per collected item" },
+    { name: "AI Search (preview)", description: "Natural-language question-and-answer search over the evidence set" },
+    { name: "Examine", description: "Deep AI content examination extracting and risk-rating specific data types" },
+  ],
+  labEnvironment: [
+    { label: "Tenant", value: "securem365lsb.onmicrosoft.com (Microsoft 365 lab tenant)" },
+    { label: "Investigation", value: "Test User 1 - Data exfiltration investigation" },
+    { label: "Template", value: "Surface employee data exfiltration" },
+    { label: "Subject user", value: "testuser1@securem365lsb.onmicrosoft.com" },
+    { label: "Data sources", value: "Audit, Endpoint DLP" },
+    { label: "Items collected", value: "10 (Word, Excel, .cmd, .zip)" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Access Data Security Investigations",
+      description: "Open DSI from the Purview Solutions menu and complete the required setup tasks before first use.",
+      steps: [
+        "Confirm pay-as-you-go billing for data storage is configured",
+        "Provision AI capacity units for the AI-powered stages",
+        "Confirm Admin/Investigator/Reviewer roles are assigned",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Create the investigation",
+      description: "Stand up a scoped investigation using a pre-built template rather than building scope logic from scratch.",
+      steps: [
+        "Select \"Surface employee data exfiltration\" from the search template dialog",
+        "Enter the subject user and review the auto-filled AI context and date range",
+        "Confirm the auto-filled user activity list and start investigating",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Identify: scope search and data sources",
+      description: "Add the subject user as a data source across both cloud and endpoint evidence.",
+      steps: [
+        "Add the subject user via \"Search for sources\" and confirm mailbox and site inclusion in Manage sources",
+        "Configure the Endpoint DLP tab with a matching date range for device-level evidence",
+        "Add the scoped sources to the investigation and monitor Audit search progress",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Analyze: categorize and search",
+      description: "Run the collected evidence through AI categorization and query it in natural language.",
+      steps: [
+        "Run Categorize with AI across all 10 prepared items",
+        "Review the resulting content categories across the evidence set",
+        "Ask AI Search (preview) a natural-language question to triage down to the files that mattered",
+      ],
+    },
+    {
+      phase: "Phase 5",
+      title: "Examine the highest-risk file",
+      description: "Run deep AI content examination against the single most concerning document.",
+      steps: [
+        "Select the highest-risk file and choose an Examination type (Personal Data / Credentials)",
+        "Review the structured results table of extracted, risk-rated findings",
+        "Cross-check the AI-generated disclaimer before treating findings as confirmed",
+      ],
+    },
+    {
+      phase: "Phase 6",
+      title: "Mitigate and audit",
+      description: "Track remediation to completion and export a full audit trail.",
+      steps: [
+        "Add the confirmed high-risk file to the Mitigation list and update its status to Completed",
+        "Review the Activities tab for a full timestamped history of every investigation action",
+        "Export the Activities and Summary content ahead of HR/legal handoff",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Reconstruct the audit search window used by the investigation template",
+      language: "powershell",
+      filename: "Get-DSIAuditActivity.ps1",
+      code: `# Illustrative scaffold mirroring the "Surface employee data exfiltration" template scope
+Connect-IPPSSession -UserPrincipalName admin@yourtenant.onmicrosoft.com
+
+.\Get-DSIAuditActivity.ps1 \`
+  -UserPrincipalName "testuser1@securem365lsb.onmicrosoft.com" \`
+  -StartDate (Get-Date).AddDays(-7) \`
+  -EndDate (Get-Date) \`
+  -Operations "FileAccessed","FileCopied","FileDeleted","FileDownloaded","FileMoved","FileRenamed","FileUploaded","SensitivityLabelChanged","SensitivityLabelRemoved","Send"`,
+    },
+  ],
+  screenshots: [
+    { title: "Purview Solutions Menu", caption: "Data Security Investigations entry point alongside Audit, DLP and Insider Risk Management.", phase: "Phase 1" },
+    { title: "Investigation Template Selection", caption: "\"Surface employee data exfiltration\" template chosen from the Create investigation dialog.", phase: "Phase 2" },
+    { title: "Data Source Scoping", caption: "Subject user added with mailbox and site inclusion confirmed in Manage sources.", phase: "Phase 3" },
+    { title: "AI Categorization Results", caption: "10 collected items classified into 11 content categories.", phase: "Phase 4" },
+    { title: "AI Search (preview)", caption: "Natural-language question narrows the evidence set to the two files containing card data.", phase: "Phase 4" },
+    { title: "Examine Results", caption: "Structured findings table showing 9 risk-rated payment card numbers extracted from a single document.", phase: "Phase 5" },
+    { title: "Mitigation List", caption: "Confirmed high-risk file tracked to a Completed remediation status.", phase: "Phase 6" },
+    { title: "Activities Audit Trail", caption: "Full timestamped history of every Audit search, Categorize and Examine action.", phase: "Phase 6" },
+  ],
+  validation: [
+    { item: "Investigation Created", detail: "Investigation created from the \"Surface employee data exfiltration\" template with auto-filled AI context and date range." },
+    { item: "Sources Scoped", detail: "Subject user's mailbox and site confirmed via Manage sources." },
+    { item: "Endpoint DLP Configured", detail: "Endpoint DLP search tab configured with a matching date range and subject user." },
+    { item: "Evidence Collected", detail: "Audit search completed; 10 items added to scope and prepared for AI." },
+    { item: "AI Categorization", detail: "Categorize produced 11 distinct content categories across the 10 items." },
+    { item: "AI Search Accuracy", detail: "Natural-language query correctly cited the 2 files that actually contained card numbers." },
+    { item: "AI Examination", detail: "Examine extracted 9 risk-rated payment card numbers from the highest-risk file." },
+    { item: "Mitigation Tracked", detail: "High-risk file tracked in the Mitigation list through to Completed status." },
+    { item: "Full Audit Trail", detail: "Activities tab recorded timestamps, duration and performing account for every action." },
+  ],
+  challenges: [
+    {
+      title: "AI output is an accelerant, not a verdict",
+      detail: "Purview explicitly flags Categorize and Examine output as AI-generated and possibly incorrect, so every high-risk finding was treated as a lead requiring human confirmation before any HR or legal action.",
+    },
+    {
+      title: "No published PowerShell equivalent for the AI stages",
+      detail: "Categorize, AI Search and Examine are portal/Copilot-driven with no direct cmdlet equivalent, so automation was scoped to the evidence-gathering side using Search-UnifiedAuditLog.",
+    },
+  ],
+  lessons: [
+    "AI capacity and pay-as-you-go billing are hard prerequisites — Categorize, AI Search and Examine will not run without both provisioned first.",
+    "Templates auto-fill context that should be reviewed, not assumed, especially the lookback window against an employee's actual notice period.",
+    "Categorize and Examine are complementary: Categorize triages breadth across the whole evidence set, Examine gives depth on the highest-priority file.",
+    "The Activities tab is the definitive, exportable audit trail for any investigation that could become an HR or legal matter.",
+  ],
+  businessImpact: [
+    { label: "Investigation Turnaround", value: "10 files triaged to 1 in minutes", icon: "efficiency" },
+    { label: "Regulated Data Found", value: "9 card numbers, High risk", icon: "risk" },
+    { label: "Mitigation Tracked", value: "Completed status, fully audited", icon: "compliance" },
+    { label: "Insider Risk Coverage", value: "Mailbox + endpoint evidence", icon: "shield" },
+  ],
+  skills: [
+    "Microsoft Purview Data Security Investigations",
+    "Insider risk / data exfiltration investigation methodology",
+    "Generative AI-assisted categorization and natural-language search",
+    "Deep content examination and sensitive data risk rating",
+    "Unified Audit Log and Endpoint DLP evidence configuration",
+    "PowerShell automation for compliance evidence gathering",
+  ],
+  relatedCertifications: ["SC-400", "MS-102", "SC-200", "SC-300"],
+  blogArticles: [],
+  repo: {
+    name: "lokeshm-it/Microsoft-Purview-Data-Security-Investigations",
+    description: "AI-powered departing-employee data exfiltration investigation built on Microsoft Purview Data Security Investigations.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Data-Security-Investigations",
+  },
+  downloads: standardDownloads,
+};
+
+/* ------------------------------------------------------------------ */
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -2329,6 +2529,7 @@ export const caseStudies: CaseStudy[] = [
   zeroTrustDevice,
   entraIdProtection,
   zeroTrustIdentity,
+  purviewDsi,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
