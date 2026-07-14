@@ -3582,6 +3582,285 @@ const zeroTrustEmailSecurity: CaseStudy = {
   downloads: standardDownloads,
 };
 
+const informationBarriers: CaseStudy = {
+  "slug": "information-barriers",
+  "title": "Microsoft Purview Information Barriers",
+  "tagline": "Compliance-enforced ethical wall between Finance and HR, blocking Teams communication and SharePoint/OneDrive collaboration in both directions, independently verified via PowerShell and live Teams enforcement testing.",
+  "category": "Compliance · Insider Risk",
+  "hero": false,
+  "outcome": "Configured attribute-based Finance and HR segments and two directional Information Barrier policies, confirmed a full bidirectional block via Exchange Online PowerShell (Communication1To2/2To1: False), and proved real-world enforcement when a live Teams chat message between the two segments failed to send.",
+  "badges": [
+    "Microsoft Purview",
+    "Information Barriers",
+    "Insider Risk",
+    "Microsoft Teams",
+    "Exchange Online PowerShell"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 / Purview",
+  "deployment": "Home Lab",
+  "implementationTime": "1 day",
+  "certifications": [
+    "SC-400",
+    "SC-300"
+  ],
+  "executiveSummary": [
+    "This project implemented and validated Microsoft Purview Information Barriers to create a compliance-enforced ethical wall between the Finance and HR departments in a Microsoft 365 tenant, blocking Teams communication and SharePoint/OneDrive collaboration in both directions.",
+    "Two attribute-based segments (Finance Department, HR Department) were created from the Department directory attribute, and a pair of directional Information Barrier policies (Finance-HR Block Policy, HR-Finance Block Policy) was configured as Blocked and Active, then compiled tenant-wide by the Purview policy application engine.",
+    "Enforcement was independently verified at three layers: the Purview policy application job reaching Completed/100%, Exchange Online PowerShell confirming Communication1To2: False and Communication2To1: False between a Finance-segment and an HR-segment test user, and a live Microsoft Teams chat attempt between the two users returning \"Failed to send.\""
+  ],
+  "businessProblem": {
+    "problem": "Without a technical control, any two Microsoft 365 users can freely chat, call and share files in Teams and SharePoint/OneDrive regardless of department or role, and relying on policy and training alone does not prevent accidental or intentional information leakage between segregated business units such as Finance and HR.",
+    "importance": "Regulated organizations in financial services, healthcare, legal and public sector are often required to prevent certain groups of employees from communicating to avoid conflicts of interest, insider trading, or inappropriate access to sensitive personal or financial data, and need demonstrable, auditable technical enforcement rather than a policy document alone.",
+    "risks": [
+      "Unrestricted Teams chat/calls and SharePoint/OneDrive collaboration between segregated departments",
+      "Conflict-of-interest or insider-trading exposure between Finance and HR",
+      "Inappropriate access to sensitive compensation, workforce action, or financial reporting data",
+      "No auditable, PowerShell-queryable evidence of segregation for compliance reporting"
+    ],
+    "compliance": [
+      "Conflict-of-interest and insider-trading prevention obligations",
+      "Auditable segregation-of-duties evidence via Get-EXOInformationBarrierRelationship"
+    ]
+  },
+  "solutionOverview": [
+    "Created two attribute-based Information Barrier segments — Finance Department and HR Department — filtered on the Department directory attribute (department -eq 'Finance').",
+    "Configured two directional Information Barrier policies (Finance-HR Block Policy and HR-Finance Block Policy) with Communication and collaboration set to Blocked and Policy status set to Active, then ran the Purview policy application engine to compile the relationship tenant-wide.",
+    "Independently verified the enforced relationship using Exchange Online PowerShell (Get-EXOInformationBarrierRelationship) and a live Microsoft Teams chat attempt between a Finance-segment and an HR-segment test user."
+  ],
+  "architectureCaption": "Finance Department and HR Department segments are defined from the Department directory attribute; two directional Blocked/Active Information Barrier policies are compiled by the Purview policy application engine into a bidirectional relationship that Teams, SharePoint and OneDrive enforce at the point of communication.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Purview Information Barriers",
+      "description": "Segments, policies and policy application engine"
+    },
+    {
+      "name": "Microsoft Purview compliance portal",
+      "description": "Segment and policy configuration workspace"
+    },
+    {
+      "name": "Exchange Online PowerShell",
+      "description": "ExchangeOnlineManagement module — relationship verification cmdlets"
+    },
+    {
+      "name": "Department directory attribute",
+      "description": "Recipient attribute used as the segment filter condition"
+    },
+    {
+      "name": "Microsoft Teams",
+      "description": "1:1 chat enforcement surface — validated live"
+    },
+    {
+      "name": "SharePoint Online / OneDrive for Business",
+      "description": "Collaboration surfaces governed by the same IB policy"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Segments",
+      "value": "Finance Department, HR Department"
+    },
+    {
+      "label": "Segment filter",
+      "value": "department -eq 'Finance'"
+    },
+    {
+      "label": "Policies",
+      "value": "Finance-HR Block Policy, HR-Finance Block Policy"
+    },
+    {
+      "label": "Policy application duration",
+      "value": "~4.5 minutes (ApplyInProgress → Completed)"
+    },
+    {
+      "label": "Test users",
+      "value": "testuser1 (Finance), testuser2 (HR)"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Segment creation",
+      "description": "Define the two organizational segments used to group users by attribute.",
+      "steps": [
+        "Create the Finance Department segment with filter Department Equal Finance",
+        "Confirm the wizard compiles the filter to department -eq 'Finance'",
+        "Create the HR Department segment using the equivalent Department-based filter"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Policy creation",
+      "description": "Create the two directional policies required for a bidirectional block.",
+      "steps": [
+        "Create Finance-HR Block Policy, assign the Finance Department segment, and block against HR Department",
+        "Disable Allow moderation and set Policy status to Active",
+        "Create the corresponding HR-Finance Block Policy for the opposite direction"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Policy application",
+      "description": "Compile the configured policies into an enforceable tenant-wide relationship.",
+      "steps": [
+        "Trigger the Information Barrier policy application job",
+        "Monitor progress from ApplyInProgress to PendingCompletion",
+        "Confirm the job reaches Completed at 100% before validating enforcement"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "PowerShell verification",
+      "description": "Independently confirm segment resolution and the computed relationship.",
+      "steps": [
+        "Connect to Exchange Online via the ExchangeOnlineManagement module",
+        "Run Get-EXOInformationBarrierRelationship between testuser1 and testuser2",
+        "Confirm Visibility1To2/2To1 and Communication1To2/2To1 all return False",
+        "Re-run the command to confirm the result is stable, not transient"
+      ]
+    },
+    {
+      "phase": "Phase 5",
+      "title": "Live Teams enforcement test",
+      "description": "Validate real-world enforcement at the client, not just the portal or PowerShell.",
+      "steps": [
+        "Sign in as Test User 1 (Finance segment) in Microsoft Teams",
+        "Open the existing 1:1 chat with Test User 2 (HR segment)",
+        "Attempt to send a message and confirm Teams displays 'Failed to send'"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Connect to Exchange Online and verify the Information Barrier relationship",
+      "language": "powershell",
+      "filename": "Verify-InformationBarrier.ps1",
+      "code": "# Connect to Exchange Online (required for all IB cmdlets)\nConnect-ExchangeOnline -UserPrincipalName \"admin@securem365lsb.onmicrosoft.com\"\n\n# Verify the computed relationship between two specific recipients\n.\\Verify-InformationBarrier.ps1 -RecipientId1 \"testuser1@securem365lsb.onmicrosoft.com\" -RecipientId2 \"testuser2@securem365lsb.onmicrosoft.com\"\n\n# View all configured segments and policies\nGet-OrganizationSegment\nGet-InformationBarrierPolicy\n\n# Manually trigger policy application and check job status\nStart-InformationBarrierPoliciesApplication\nGet-InformationBarrierPoliciesApplicationStatus"
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Segments Created",
+      "caption": "Segments list showing Finance Department and HR Department both present.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Policy Configuration Summary",
+      "caption": "Wizard summary confirming Finance-HR Block Policy: Blocked, HR Department, Active, moderation off.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Both Directional Policies Active",
+      "caption": "Policies list showing Finance-HR Block Policy and HR-Finance Block Policy, both Active.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Policy Application Completed",
+      "caption": "Policy application job progressing from ApplyInProgress to Completed at 100%.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "PowerShell Relationship Verification",
+      "caption": "Get-EXOInformationBarrierRelationship output showing Communication1To2 and Communication2To1 both False.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "Teams Chat Blocked",
+      "caption": "Live Teams chat attempt between Finance and HR test users showing 'Failed to send.'",
+      "phase": "Phase 5"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Segments Created Correctly",
+      "detail": "Finance Department and HR Department both present in the Purview Segments page."
+    },
+    {
+      "item": "Policy Configuration Accurate",
+      "detail": "Wizard summary confirms Blocked communication, HR Department as the blocked segment, Active status, moderation disabled."
+    },
+    {
+      "item": "Both Directional Policies Active",
+      "detail": "Policies list confirms 2 Active policies — Finance-HR Block Policy and HR-Finance Block Policy."
+    },
+    {
+      "item": "Policy Application Completed",
+      "detail": "Policy application job reached Completed at 100% (~4.5 minutes from start)."
+    },
+    {
+      "item": "Segment Resolution Correct",
+      "detail": "Get-EXOInformationBarrierRelationship correctly maps testuser1 to Finance Department and testuser2 to HR Department."
+    },
+    {
+      "item": "Bidirectional Block Enforced",
+      "detail": "PowerShell confirms Communication1To2: False and Communication2To1: False; re-verified as stable on a second run."
+    },
+    {
+      "item": "Real-World Teams Enforcement",
+      "detail": "A live chat message between the two segmented test users returned 'Failed to send' in the Teams client."
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Asynchronous policy application",
+      "detail": "The policy application job took roughly 4–5 minutes to move from ApplyInProgress to Completed; validating enforcement before completion would have produced a false negative."
+    },
+    {
+      "title": "Incomplete evidence for the HR segment wizard",
+      "detail": "The HR Department segment and HR-Finance Block Policy creation screens were not captured, so their exact filter expression is assumed by naming convention rather than visually confirmed."
+    }
+  ],
+  "lessons": [
+    "Information Barriers are attribute-driven — the accuracy of the underlying directory attribute (Department) directly determines segment and policy accuracy.",
+    "Bidirectional segregation requires two policies, not one — a single policy only blocks the assigned segment's outbound communication toward the blocked segment.",
+    "Policy application is asynchronous and must be confirmed as Completed before relying on the control or presenting it as enforced.",
+    "PowerShell verification and live-client testing are complementary — the portal and PowerShell confirm configuration, while a real chat attempt confirms enforcement.",
+    "Information Barriers block new communication; they do not retroactively delete or hide prior chat history."
+  ],
+  "businessImpact": [
+    {
+      "label": "Enforcement Layers Validated",
+      "value": "3 (Portal, PowerShell, Teams)",
+      "icon": "compliance"
+    },
+    {
+      "label": "Bidirectional Block Confirmed",
+      "value": "Communication False both ways",
+      "icon": "shield"
+    },
+    {
+      "label": "Policy Application Time",
+      "value": "~4.5 minutes",
+      "icon": "clock"
+    },
+    {
+      "label": "Segments Configured",
+      "value": "2 (Finance, HR)",
+      "icon": "identity"
+    }
+  ],
+  "skills": [
+    "Microsoft Purview compliance portal administration",
+    "Information Barriers segment and policy design (attribute-based filtering)",
+    "Exchange Online PowerShell (ExchangeOnlineManagement module)",
+    "Asynchronous policy application monitoring and troubleshooting",
+    "End-to-end control validation methodology (config → apply → PowerShell verify → live enforcement test)"
+  ],
+  "relatedCertifications": [
+    "SC-400",
+    "SC-300",
+    "MS-102"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "lokeshm-it/Microsoft-Information-Barriers",
+    "description": "Microsoft Purview Information Barriers enforcing a compliance-driven ethical wall between Finance and HR, validated via PowerShell and live Teams enforcement testing.",
+    "url": "https://github.com/lokeshm-it/Microsoft-Information-Barriers"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -3601,6 +3880,7 @@ export const caseStudies: CaseStudy[] = [
   defenderXdrSentinel,
   continuousTvm,
   zeroTrustEmailSecurity,
+  informationBarriers,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
