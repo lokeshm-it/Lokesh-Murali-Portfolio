@@ -3303,6 +3303,285 @@ const continuousTvm: CaseStudy = {
   downloads: standardDownloads,
 };
 
+const zeroTrustEmailSecurity: CaseStudy = {
+  "slug": "zero-trust-email-security",
+  "title": "Zero Trust Email Security",
+  "tagline": "Defence-in-depth email protection with Microsoft Defender for Office 365 — sandbox every attachment, inspect every URL at click time, and quarantine identity-based impersonation attacks.",
+  "category": "Email · Threat Protection",
+  "hero": false,
+  "outcome": "Deployed Safe Attachments, Safe Links and mailbox/spoof-intelligence anti-phishing across the tenant, validated user-reported phishing through a live attack simulation, and produced a verified +55 point Microsoft Secure Score improvement across a two-day implementation window.",
+  "badges": [
+    "Microsoft Defender for Office 365",
+    "Safe Attachments",
+    "Safe Links",
+    "Anti-Phishing",
+    "Zero Trust"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 Business Premium / Defender for Office 365 Plan 2",
+  "deployment": "Home Lab",
+  "implementationTime": "2 days",
+  "certifications": [
+    "SC-200",
+    "MS-102"
+  ],
+  "executiveSummary": [
+    "This project implemented a Zero Trust email security framework using Microsoft Defender for Office 365 Plan 2 across the Patchthecloud.onmicrosoft.com tenant, treating email as an untrusted entry point at every stage rather than a perimeter-trusted channel.",
+    "Safe Attachments was deployed with a Block action and AdminOnlyAccessPolicy quarantine so every attachment is detonated in a cloud sandbox before delivery, while Safe Links was configured with real-time URL scanning, wait-for-scan delivery, and coverage across Email, Teams and Office apps so every link is re-evaluated at click time.",
+    "An anti-phishing policy layered mailbox intelligence, domain impersonation protection and spoof intelligence to catch identity-based attacks regardless of content, and the full stack was validated end-to-end: a live attack simulation confirmed a test user correctly reported a credential-harvesting email, and the Microsoft Secure Score history export confirmed a +55 point improvement directly attributable to these controls."
+  ],
+  "businessProblem": {
+    "problem": "Malicious attachments reach mailboxes without pre-delivery analysis, phishing links embedded in email bypass perimeter controls once delivered, impersonation and business email compromise exploit trusted sender relationships, and there is no unified telemetry for email-borne threats, link clicks, or remediation events.",
+    "importance": "Without layered, identity-aware email controls, users have no structured way to report and escalate suspicious email, and the SOC cannot measure or demonstrate improvement in email security posture over time.",
+    "risks": [
+      "Malware delivered via attachments with no pre-delivery sandbox analysis",
+      "Phishing links that evade perimeter filtering and are clicked after delivery",
+      "CEO fraud and domain spoofing exploiting trusted sender relationships",
+      "No structured user-reporting path for suspicious email",
+      "No unified SOC telemetry for email threats, clicks or remediation outcomes"
+    ],
+    "compliance": [
+      "Defence-in-depth email security control documentation for audit purposes",
+      "Measurable Secure Score evidence of applied controls for governance reporting"
+    ]
+  },
+  "solutionOverview": [
+    "Deployed Safe Attachments with a Block action and AdminOnlyAccessPolicy quarantine so detected malware never reaches a mailbox and quarantined items require administrator review before release.",
+    "Configured Safe Links at Priority 0 with real-time URL scanning, wait-for-scan-before-delivery, and coverage extended to Teams and Office 365 apps, closing the gap where attackers pivot away from the inbox.",
+    "Layered an anti-phishing policy with mailbox intelligence, domain impersonation protection and spoof intelligence, then validated the full stack with a live attack simulation and confirmed a +55 point Secure Score improvement from the Secure Score history export."
+  ],
+  "architectureCaption": "Inbound mail is sandboxed by Safe Attachments before delivery, links are rewritten and re-evaluated at click time by Safe Links across Email, Teams and Office apps, and an identity-aware anti-phishing policy quarantines impersonation and spoofing attempts; Zero-Hour Auto Purge retroactively removes threats detected after delivery.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Defender for Office 365 Plan 2",
+      "description": "Unified email threat protection platform"
+    },
+    {
+      "name": "Safe Attachments",
+      "description": "Pre-delivery cloud sandbox detonation of all email attachments"
+    },
+    {
+      "name": "Safe Links",
+      "description": "Click-time URL rewriting and inspection across Email, Teams and Office apps"
+    },
+    {
+      "name": "Anti-Phishing Policy",
+      "description": "Mailbox intelligence, domain impersonation and spoof intelligence"
+    },
+    {
+      "name": "User-Reported Phishing",
+      "description": "Converts user reports into Defender threat signals"
+    },
+    {
+      "name": "Zero-Hour Auto Purge (ZAP)",
+      "description": "Retroactive post-delivery removal of detected threats"
+    },
+    {
+      "name": "Microsoft Secure Score",
+      "description": "Measurable security posture improvement tracking"
+    },
+    {
+      "name": "Attack Simulation Training",
+      "description": "Real-world phishing simulation and user awareness validation"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Tenant",
+      "value": "Patchthecloud.onmicrosoft.com"
+    },
+    {
+      "label": "Licence",
+      "value": "Microsoft 365 Business Premium / Defender for Office 365 Plan 2"
+    },
+    {
+      "label": "Test mailbox",
+      "value": "Johnsen@Patchthecloud.onmicrosoft.com"
+    },
+    {
+      "label": "External test sender",
+      "value": "tara@msteamsexternalone.com"
+    },
+    {
+      "label": "Portal",
+      "value": "security.microsoft.com"
+    },
+    {
+      "label": "Implementation date",
+      "value": "10–11 January 2026"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Safe Attachments",
+      "description": "Deploy pre-delivery sandbox detonation for all attachments.",
+      "steps": [
+        "Configure the Safe Attachments policy with a Block action for detected malware",
+        "Set the quarantine policy to AdminOnlyAccessPolicy",
+        "Disable attachment redirection and apply the policy to all recipients"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Safe Links",
+      "description": "Deploy click-time URL inspection across mail and collaboration apps.",
+      "steps": [
+        "Create a Safe Links policy at Priority 0 (highest)",
+        "Enable real-time URL scanning and wait-for-scan-before-delivery",
+        "Enable Do not rewrite URLs (API-only mode) and extend coverage to Teams and Office 365 apps"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Anti-phishing policy",
+      "description": "Layer identity-based impersonation and spoof detection.",
+      "steps": [
+        "Create an impersonation protection policy scoped to all mailboxes",
+        "Enable user impersonation, domain impersonation and mailbox intelligence with Quarantine actions",
+        "Enable spoof intelligence and first-contact / impersonation safety tips"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "Attack simulation validation",
+      "description": "Validate the end-to-end stack with a real phishing simulation.",
+      "steps": [
+        "Send a simulated credential-harvesting email from an external test sender",
+        "Confirm the test user (John Sen) correctly identifies and reports the phishing email",
+        "Confirm the report is ingested as a Defender threat signal"
+      ]
+    },
+    {
+      "phase": "Phase 5",
+      "title": "Secure Score validation",
+      "description": "Confirm measurable, evidenced improvement in security posture.",
+      "steps": [
+        "Export the Microsoft Secure Score history via Microsoft Graph",
+        "Confirm +55 points gained directly from the deployed email controls",
+        "Document each scoring action and its effective date for audit evidence"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Deploy Defender email policies and export Secure Score / threat reports",
+      "language": "powershell",
+      "filename": "New-DefenderEmailPolicies.ps1",
+      "code": "# Deploy Safe Attachments, Safe Links and Anti-Phishing policies via Exchange Online PowerShell\n.\\New-DefenderEmailPolicies.ps1 -Tenant \"Patchthecloud.onmicrosoft.com\" -QuarantinePolicy \"AdminOnlyAccessPolicy\"\n\n# Export Secure Score history and recommended actions to CSV via Microsoft Graph\n.\\Get-SecureScoreReport.ps1 -OutputPath \".\\exports\\Microsoft-Secure-Score.csv\"\n\n# Export email threat detection summary from Defender for Office 365 via Graph\n.\\Get-EmailThreatReport.ps1 -Days 2"
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Safe Attachments Policy List",
+      "caption": "Safe Attachments policy shown as On with Priority 0.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Safe Links Policy List",
+      "caption": "Safe Links Policy shown as On with Priority 0.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Anti-Phishing Policy Created",
+      "caption": "Confirmation banner showing the impersonation protection policy created and in effect immediately.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "Attack Simulation — Reported Phish",
+      "caption": "John Sen correctly reported the simulated phishing email from tara@msteamsexternalone.com.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "Secure Score Trend",
+      "caption": "Secure Score graph showing an upward trend of +55 points across the implementation window.",
+      "phase": "Phase 5"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Safe Attachments Active",
+      "detail": "Policy list confirms Safe Attachments On at Priority 0 with Block action and AdminOnlyAccessPolicy quarantine."
+    },
+    {
+      "item": "Safe Links Active",
+      "detail": "Policy list confirms Safe Links Policy On at Priority 0 with real-time scanning and Teams/Office coverage."
+    },
+    {
+      "item": "Anti-Phishing Policy Created",
+      "detail": "Confirmation banner shown; policy in effect immediately with mailbox and spoof intelligence enabled."
+    },
+    {
+      "item": "Attack Simulation Passed",
+      "detail": "Test user John Sen correctly identified and reported a simulated phishing email."
+    },
+    {
+      "item": "Secure Score Improvement Confirmed",
+      "detail": "+55 points verified via the Microsoft Secure Score history CSV export across 10–11 January 2026."
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Sandbox detonation adds delivery latency",
+      "detail": "Safe Attachments Block mode delays delivery while attachments are detonated, so users need to be informed before enabling this in production."
+    },
+    {
+      "title": "Secure Score is a lagging indicator",
+      "detail": "Secure Score points register only after Defender detects and scores the control, not immediately after the policy is saved, so validation required waiting for the scoring refresh."
+    }
+  ],
+  "lessons": [
+    "Safe Attachments Block mode delays delivery — sandbox detonation adds latency, so communicate this to users before enabling in production.",
+    "\"Do not rewrite URLs\" in API-only mode is not reduced security — Defender still evaluates every URL via the Safe Links API, it just improves compatibility with mail clients that break rewritten links.",
+    "Anti-phishing threshold 1 (Standard) is appropriate for most tenants — raising it to Aggressive significantly increases false positives on internal business email.",
+    "Single user-reported phishing reports may not generate alerts on their own — this is expected Defender behaviour, since alerts fire when reports correlate with other signals, but every report still contributes to threat intelligence.",
+    "Secure Score is a lagging indicator — points register after Defender detects and scores the control, not immediately after policy creation."
+  ],
+  "businessImpact": [
+    {
+      "label": "Secure Score Improvement",
+      "value": "+55 pts",
+      "icon": "shield"
+    },
+    {
+      "label": "Attack Simulation Result",
+      "value": "Passed — phish reported",
+      "icon": "identity"
+    },
+    {
+      "label": "Attachment Protection",
+      "value": "100% sandboxed pre-delivery",
+      "icon": "risk"
+    },
+    {
+      "label": "Implementation Window",
+      "value": "2 days",
+      "icon": "efficiency"
+    }
+  ],
+  "skills": [
+    "Microsoft Defender for Office 365 policy configuration",
+    "Safe Attachments and Safe Links deployment",
+    "Anti-phishing policy design (mailbox and spoof intelligence)",
+    "Attack Simulation Training and user-reported phishing validation",
+    "Microsoft Secure Score measurement and reporting",
+    "Exchange Online PowerShell and Microsoft Graph automation"
+  ],
+  "relatedCertifications": [
+    "SC-200",
+    "MS-102",
+    "SC-100"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "lokeshm-it/Zero-Trust-Email-Security",
+    "description": "Zero Trust email security using Microsoft Defender for Office 365 — Safe Attachments, Safe Links, anti-phishing with mailbox and spoof intelligence, and a verified +55 Secure Score improvement.",
+    "url": "https://github.com/lokeshm-it/Zero-Trust-Email-Security"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -3321,6 +3600,7 @@ export const caseStudies: CaseStudy[] = [
   purviewCommComp,
   defenderXdrSentinel,
   continuousTvm,
+  zeroTrustEmailSecurity,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
