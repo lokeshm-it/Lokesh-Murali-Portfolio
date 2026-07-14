@@ -3002,6 +3002,307 @@ const defenderXdrSentinel: CaseStudy = {
   downloads: standardDownloads,
 };
 
+const continuousTvm: CaseStudy = {
+  "slug": "continuous-tvm",
+  "title": "Continuous Threat & Vulnerability Management",
+  "tagline": "Risk-based CVE prioritisation with Microsoft Defender TVM, moving from point-in-time scanning to continuous, exploitability-weighted remediation.",
+  "category": "Threat Signals · Vulnerability Management",
+  "hero": false,
+  "outcome": "Baselined a 57/100 Medium exposure score across 33 detected CVEs, resolved the highest-impact finding (30 weaknesses) with a single Windows 11 update, formally excepted vendor-managed OpenSSL CVEs in OneDrive, and deployed ASR + PUA hardening controls via Intune.",
+  "badges": [
+    "Microsoft Defender for Endpoint",
+    "TVM",
+    "ASR Rules",
+    "PUA Protection",
+    "Zero Trust"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 Business Premium / Intune",
+  "deployment": "Home Lab",
+  "implementationTime": "1 day",
+  "certifications": [
+    "SC-200",
+    "MD-102"
+  ],
+  "executiveSummary": [
+    "This project replaced point-in-time vulnerability scanning with a continuous, risk-based Threat & Vulnerability Management (TVM) programme using Microsoft Defender for Endpoint Plan 2 across the Patchthecloud.onmicrosoft.com tenant.",
+    "A baseline assessment recorded a 57/100 Medium exposure score across 33 detected CVEs, with Defender TVM prioritising findings by exploitability and exposure rather than CVSS severity alone, surfacing a Windows 11 OS update as the single highest-impact remediation (impact score 57.29, 30 weaknesses).",
+    "Remediation covered the full lifecycle: the Windows update was applied and resolved the top CVEs, three OpenSSL CVEs bundled inside OneDrive were formally recorded as a vendor-managed risk exception, and two additional hardening controls — an Attack Surface Reduction rule blocking executable content from email, and PUA Protection in Block mode — were deployed through Intune Endpoint Security."
+  ],
+  "businessProblem": {
+    "problem": "Point-in-time vulnerability scans miss CVEs disclosed between scan cycles, severity-only prioritisation causes patch fatigue on low-risk findings while high-exploitability items stay open, and there is no formal process for CVEs embedded in vendor-managed components that cannot be patched directly.",
+    "importance": "Without continuous, risk-based vulnerability management, security teams cannot demonstrate measurable exposure reduction to leadership, third-party application CVEs go unaddressed by OS-only patching, and endpoints remain exposed to known attack techniques while patches are tested and staged.",
+    "risks": [
+      "Emerging CVEs disclosed between scan cycles remain undetected",
+      "Patch fatigue from prioritising by CVSS score rather than real-world exploitability",
+      "Vendor-bundled third-party CVEs (e.g. OpenSSL in OneDrive) left unpatched with no formal exception process",
+      "No measurable before/after exposure evidence for leadership reporting",
+      "Attack surface left unhardened between patch cycles"
+    ],
+    "compliance": [
+      "Continuous vulnerability management practice for regulatory and audit expectations",
+      "Documented risk-exception register for vendor-managed findings"
+    ]
+  },
+  "solutionOverview": [
+    "Onboarded the managed device to Microsoft Defender for Endpoint Plan 2 and established a continuous TVM baseline: 57/100 Medium exposure score across 33 detected vulnerabilities.",
+    "Prioritised remediation using Defender TVM's exposure and exploitability weighting rather than CVSS alone, identifying the Windows 11 OS update as the single highest-impact action.",
+    "Executed the full remediation lifecycle — patched the top finding, formally excepted the vendor-managed OpenSSL CVEs with monitoring, and deployed ASR and PUA Intune policies to harden the endpoint independent of the patch cycle."
+  ],
+  "architectureCaption": "The Defender for Endpoint sensor streams continuous vulnerability telemetry into Defender TVM, which scores and prioritises findings by exploitability and exposure; remediation flows either as an OS update, a documented risk exception, or an Intune-deployed ASR/PUA hardening policy.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Defender for Endpoint Plan 2",
+      "description": "TVM engine — continuous vulnerability detection and exposure scoring"
+    },
+    {
+      "name": "Threat & Vulnerability Management (TVM)",
+      "description": "Risk-based prioritisation by exploitability and exposure, not CVSS alone"
+    },
+    {
+      "name": "Microsoft Intune Endpoint Security",
+      "description": "ASR rule deployment and PUA protection policy management"
+    },
+    {
+      "name": "Attack Surface Reduction (ASR) Rules",
+      "description": "Blocks executable content delivered via email client and webmail"
+    },
+    {
+      "name": "PUA Protection",
+      "description": "Blocks Potentially Unwanted Applications in real time"
+    },
+    {
+      "name": "Microsoft Defender XDR",
+      "description": "Unified security operations visibility across the tenant"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Tenant",
+      "value": "Patchthecloud.onmicrosoft.com"
+    },
+    {
+      "label": "Licence",
+      "value": "Microsoft Defender for Endpoint Plan 2"
+    },
+    {
+      "label": "Managed device",
+      "value": "PTC_01 — Windows 11 23H2"
+    },
+    {
+      "label": "Portal",
+      "value": "security.microsoft.com"
+    },
+    {
+      "label": "Lab date",
+      "value": "January 2026"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Baseline assessment",
+      "description": "Establish the starting exposure score and vulnerability inventory.",
+      "steps": [
+        "Onboard PTC_01 to Microsoft Defender for Endpoint Plan 2",
+        "Record baseline exposure score: 57/100 (Medium) across 33 detected vulnerabilities",
+        "Review top recommendations ranked by impact score rather than CVSS alone"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Vulnerability analysis",
+      "description": "Analyse the detected CVE set and identify the highest-impact remediation.",
+      "steps": [
+        "Review the CVE sample across Windows and OpenSSL components",
+        "Identify the Windows 11 OS/built-in-app recommendation as highest impact (57.29, 30 weaknesses)",
+        "Identify the OpenSSL recommendation as a vendor-managed, non-OS finding (30.00 impact, 3 weaknesses)"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "OS remediation",
+      "description": "Resolve the single highest-impact finding via Windows Update.",
+      "steps": [
+        "Apply Windows Update on PTC_01",
+        "Confirm the Windows Update recommendation is resolved in TVM",
+        "Confirm the associated Windows CVEs are remediated"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "Vendor risk exception",
+      "description": "Formally document the OpenSSL CVEs that cannot be patched independently of the vendor.",
+      "steps": [
+        "Confirm OpenSSL is bundled inside OneDrive and cannot be patched directly",
+        "Record a partial risk exception in Defender TVM's exception register",
+        "Set the exception to monitor for a vendor-released patch"
+      ]
+    },
+    {
+      "phase": "Phase 5",
+      "title": "Attack surface hardening",
+      "description": "Deploy configuration-based controls that reduce attack surface independent of patching.",
+      "steps": [
+        "Create an Intune Endpoint Security Attack Surface Reduction Rules policy",
+        "Set 'Block executable content from email client and webmail' to Block",
+        "Edit the Microsoft Defender Antivirus policy to enable PUA Protection in Block mode",
+        "Assign both policies to PTC_01 and confirm coverage"
+      ]
+    },
+    {
+      "phase": "Phase 6",
+      "title": "Post-remediation validation",
+      "description": "Confirm measurable exposure reduction and remaining accepted risk.",
+      "steps": [
+        "Confirm PUA protection and ASR recommendations show Remediated",
+        "Confirm the OpenSSL recommendation shows as a vendor-managed exception with 0 exposed critical devices",
+        "Document the before/after exposure evidence for reporting"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Export TVM vulnerabilities, exposure scores, and deploy ASR policy",
+      "language": "powershell",
+      "filename": "Get-TVMVulnerabilityReport.ps1",
+      "code": "# Export all device vulnerabilities from Defender TVM via Microsoft Graph\n.\\Get-TVMVulnerabilityReport.ps1 -DeviceName \"PTC_01\"\n\n# Deploy Attack Surface Reduction rules via Microsoft Intune (Graph)\n.\\New-ASRPolicy.ps1 -PolicyName \"Block-Email-Executables\" -Setting \"BlockExecutableContentFromEmailClientAndWebmail\"\n\n# Export device exposure scores and TVM recommendations to CSV\n.\\Get-ExposureScoreReport.ps1 -OutputPath \".\\reports\\exposure-score.csv\""
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Baseline Exposure Score",
+      "caption": "Device exposure score of 57/100 (Medium) with 33 detected vulnerabilities.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Top TVM Recommendations",
+      "caption": "Windows 11 update and OpenSSL findings ranked by impact score rather than CVSS.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "CVE Detail List",
+      "caption": "Detected CVEs spanning Windows and OpenSSL components with CVSS and publish dates.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Windows Update Applied",
+      "caption": "Windows Update recommendation resolved after patching PTC_01.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "OpenSSL Risk Exception",
+      "caption": "OpenSSL CVEs recorded as a partial, vendor-managed exception in the TVM exception register.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "ASR Rule Configuration",
+      "caption": "Intune Attack Surface Reduction policy blocking executable content from email and webmail.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "PUA Protection Policy",
+      "caption": "Microsoft Defender Antivirus policy with PUA Protection set to Block mode.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "Post-Remediation Recommendations",
+      "caption": "ASR and PUA recommendations marked Remediated; OpenSSL shown as vendor-managed exception.",
+      "phase": "Phase 6"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Baseline Recorded",
+      "detail": "Exposure score 57/100 (Medium) captured across 33 detected vulnerabilities, 1 exploitable, 0 critical."
+    },
+    {
+      "item": "Highest-Impact Finding Identified",
+      "detail": "Windows 11 OS/built-in-app recommendation ranked highest at impact score 57.29 across 30 weaknesses."
+    },
+    {
+      "item": "OS Remediation Confirmed",
+      "detail": "Windows Update applied to PTC_01; Windows Update recommendation resolved in TVM."
+    },
+    {
+      "item": "Vendor Exception Documented",
+      "detail": "3 OpenSSL CVEs bundled in OneDrive formally recorded as a partial, vendor-managed exception."
+    },
+    {
+      "item": "ASR Rule Deployed",
+      "detail": "'Block executable content from email client and webmail' policy assigned to PTC_01 via Intune."
+    },
+    {
+      "item": "PUA Protection Enabled",
+      "detail": "PUA Protection set to Block mode via Intune Defender Antivirus policy."
+    },
+    {
+      "item": "Post-Remediation Status Verified",
+      "detail": "ASR and PUA recommendations marked Remediated; OpenSSL exception shows 0 exposed critical devices."
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Vendor-bundled CVEs cannot be patched directly",
+      "detail": "The OpenSSL CVEs are bundled inside OneDrive rather than being an OS component, so they required a formal risk-exception process instead of a direct patch."
+    },
+    {
+      "title": "Exposure score lag after remediation",
+      "detail": "Defender TVM telemetry refreshes on a schedule, so exposure score movement was not immediate after applying the Windows update and required waiting for the next refresh cycle."
+    }
+  ],
+  "lessons": [
+    "TVM prioritises by exploitability, not CVSS alone — a high-CVSS finding with no known exploit can rank below a lower-CVSS finding with active exploit code.",
+    "Third-party vulnerabilities bundled inside Microsoft components require a formal exception process rather than being left in an unacknowledged state.",
+    "ASR rules and PUA protection reduce attack surface immediately, without waiting for a patch cycle to complete.",
+    "Exposure score decreases are not instant — Defender TVM telemetry can take up to 24 hours to reflect a remediation.",
+    "Partial exceptions remain visible in TVM, showing the accepted residual risk rather than silently clearing the finding."
+  ],
+  "businessImpact": [
+    {
+      "label": "Baseline Exposure Score",
+      "value": "57 / 100 (Medium)",
+      "icon": "risk"
+    },
+    {
+      "label": "CVEs Resolved in One Update",
+      "value": "30",
+      "icon": "shield"
+    },
+    {
+      "label": "Vendor Risk Exceptions Documented",
+      "value": "3 (OpenSSL)",
+      "icon": "compliance"
+    },
+    {
+      "label": "Hardening Controls Deployed",
+      "value": "2 (ASR + PUA)",
+      "icon": "efficiency"
+    }
+  ],
+  "skills": [
+    "Microsoft Defender for Endpoint Plan 2 deployment",
+    "Threat & Vulnerability Management (TVM) risk-based prioritisation",
+    "CVE / CVSS analysis and exploitability-based triage",
+    "Vendor-managed risk exception documentation",
+    "Attack Surface Reduction (ASR) rule configuration via Intune",
+    "PUA protection policy configuration via Intune"
+  ],
+  "relatedCertifications": [
+    "SC-200",
+    "MD-102",
+    "SC-100"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "lokeshm-it/Continuous-Threat-Vulnerability-Management",
+    "description": "Continuous, risk-based vulnerability management using Microsoft Defender TVM — baseline exposure scoring, CVE remediation lifecycle, vendor risk exceptions, and ASR/PUA hardening.",
+    "url": "https://github.com/lokeshm-it/Continuous-Threat-Vulnerability-Management"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -3019,6 +3320,7 @@ export const caseStudies: CaseStudy[] = [
   purviewDsi,
   purviewCommComp,
   defenderXdrSentinel,
+  continuousTvm,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
