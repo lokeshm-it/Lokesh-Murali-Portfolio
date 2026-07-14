@@ -2704,6 +2704,304 @@ const purviewCommComp: CaseStudy = {
 };
 
 /* ------------------------------------------------------------------ */
+const defenderXdrSentinel: CaseStudy = {
+  "slug": "defender-xdr-sentinel",
+  "title": "Defender XDR + Microsoft Sentinel",
+  "tagline": "Native Defender XDR connector unified with Microsoft Sentinel for cross-pillar incident correlation and automation-first investigation.",
+  "category": "Monitoring · Response",
+  "hero": false,
+  "outcome": "Connected Microsoft Defender XDR (v3.0.12) to a Microsoft Sentinel workspace and validated automated investigation end-to-end: a real Defender for Office 365 phishing-report alert was auto-correlated into a Sentinel incident and closed in 14 minutes with zero analyst intervention.",
+  "badges": [
+    "Microsoft Sentinel",
+    "Defender XDR",
+    "SIEM",
+    "KQL",
+    "SOC Automation"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 Business Premium / Azure",
+  "deployment": "Home Lab",
+  "implementationTime": "1 day",
+  "certifications": [
+    "SC-200",
+    "SC-100"
+  ],
+  "executiveSummary": [
+    "This project unified Microsoft Defender XDR with Microsoft Sentinel to close the visibility gap left by the siloed identity, device and email controls built in earlier projects, giving a single pane of glass for detection, investigation and response.",
+    "A Log Analytics workspace was provisioned and Microsoft Sentinel enabled, then the native Defender XDR connector (v3.0.12) was installed from Content Hub to stream incidents and alerts from Defender for Endpoint, Defender for Office 365 and Defender for Identity into one workspace.",
+    "Validation traced a real signal end-to-end: a user-reported phishing simulation from the email security project surfaced as a Defender for Office 365 alert, was auto-investigated by Defender XDR, and closed as a Low-severity Sentinel incident in 14 minutes with zero manual analyst actions (MTTA: 0 min)."
+  ],
+  "businessProblem": {
+    "problem": "Microsoft 365 Business Premium generates security signals across Defender for Endpoint, Defender for Office 365, Defender for Identity and Entra ID, but each product surfaces alerts in its own console with no shared incident history.",
+    "importance": "Without a unified SIEM, attack chains spanning multiple pillars remain invisible, SOC analysts must pivot across separate consoles to correlate signals manually, and there is no centralised, audit-ready incident record for compliance or post-incident review.",
+    "risks": [
+      "Cross-pillar attack chains going undetected because signals are never correlated",
+      "Analyst time consumed pivoting between separate Defender and Entra consoles",
+      "No centralised audit trail of incidents, classifications and resolution timelines",
+      "Alert fatigue from low-value alerts that are never automatically triaged"
+    ],
+    "compliance": [
+      "Centralised security incident logging for audit and post-incident review",
+      "SOC governance reporting (MTTA/MTTC) as evidence of operational maturity"
+    ]
+  },
+  "solutionOverview": [
+    "Provisioned a dedicated Log Analytics workspace (sentinal) and enabled Microsoft Sentinel as the cloud-native SIEM on top of it.",
+    "Installed the Microsoft Defender XDR solution (v3.0.12) from Sentinel's Content Hub and connected it as a native, agentless, bi-directional connector alongside Defender for Identity and Defender for Office 365 (Preview).",
+    "Enabled built-in Defender XDR analytics rules and validated automated investigation and remediation end-to-end using a real cross-project alert, confirming incidents and MTTA/MTTC metrics land correctly in Sentinel."
+  ],
+  "architectureCaption": "Defender for Endpoint, Defender for Office 365, Defender for Identity and Entra ID stream alerts through the native Defender XDR connector into a Microsoft Sentinel workspace, where automated investigation and analytics rules correlate signals into a single incident timeline.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Sentinel",
+      "description": "Cloud-native SIEM for log ingestion, analytics rules and incident management"
+    },
+    {
+      "name": "Log Analytics Workspace",
+      "description": "Underlying data store (sentinal) for all ingested security logs"
+    },
+    {
+      "name": "Microsoft Defender XDR Connector",
+      "description": "Native bi-directional connector (v3.0.12), no agents or API keys required"
+    },
+    {
+      "name": "Defender for Office 365",
+      "description": "Email threat signal source (MDO alerts)"
+    },
+    {
+      "name": "Defender for Identity",
+      "description": "Identity-based threat signal source"
+    },
+    {
+      "name": "Analytics Rules",
+      "description": "Scheduled KQL queries generating incidents from ingested signals"
+    },
+    {
+      "name": "Automated Investigation & Remediation",
+      "description": "Resolves low-risk alerts without analyst action"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Tenant",
+      "value": "Patchthecloud.onmicrosoft.com"
+    },
+    {
+      "label": "Workspace name",
+      "value": "sentinal"
+    },
+    {
+      "label": "Connector version",
+      "value": "Microsoft Defender XDR v3.0.12"
+    },
+    {
+      "label": "License",
+      "value": "Microsoft 365 Business Premium"
+    },
+    {
+      "label": "Lab date",
+      "value": "January 2026"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Workspace creation",
+      "description": "Create the Log Analytics workspace and enable Microsoft Sentinel on top of it.",
+      "steps": [
+        "Create a Log Analytics Workspace (sentinal) in the Azure subscription",
+        "Enable Microsoft Sentinel against the new workspace",
+        "Confirm the Sentinel Overview blade loads with no data sources connected yet"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Connector install",
+      "description": "Install and connect the native Defender XDR solution from Content Hub.",
+      "steps": [
+        "Install the Microsoft Defender XDR solution (v3.0.12) from Sentinel Content Hub",
+        "Connect the Defender XDR connector — bi-directional, no agents or API keys required",
+        "Confirm Defender for Identity shows Connected and Defender for Office 365 (Preview) shows Visible"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Data source validation",
+      "description": "Confirm incidents and alerts are actually flowing into Sentinel.",
+      "steps": [
+        "Validate connector status = Connected in Data Connectors",
+        "Run a KQL query against SecurityIncident to confirm Defender XDR incidents are ingested",
+        "Run a KQL query against SecurityAlert to confirm alert-level data is present"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "Analytics rules",
+      "description": "Enable correlation logic so ingested signals become actionable incidents.",
+      "steps": [
+        "Enable the built-in Defender XDR analytics rules",
+        "Create a custom KQL detection rule summarising Defender XDR incident count by severity",
+        "Confirm new analytics rules appear as Active in the Analytics blade"
+      ]
+    },
+    {
+      "phase": "Phase 5",
+      "title": "Incident review",
+      "description": "Validate that a real signal is correlated and auto-closed correctly.",
+      "steps": [
+        "Trace the Defender for Office 365 'Email reported by user as malware or phish' alert into Sentinel",
+        "Confirm the incident was auto-investigated with Investigation state = No threats found",
+        "Record MTTA (0 min) and MTTC (14 min) from the closed incident"
+      ]
+    },
+    {
+      "phase": "Phase 6",
+      "title": "SOC governance",
+      "description": "Confirm the automation-first posture is intentional and documented, not a configuration gap.",
+      "steps": [
+        "Confirm 0 manual analyst interventions were required across the lab period",
+        "Document that an MTTA of 0 minutes reflects automation-first design rather than a monitoring gap",
+        "Review SOC outcome metrics (incident counts, severity, MTTA/MTTC) for governance reporting"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Deploy the Sentinel workspace and export incident/alert reports",
+      "language": "powershell",
+      "filename": "New-SentinelWorkspace.ps1",
+      "code": "# Deploy Log Analytics workspace and enable Microsoft Sentinel\n.\\New-SentinelWorkspace.ps1 -WorkspaceName \"sentinal\" -ResourceGroup \"rg-security\" -Location \"eastus\"\n\n# Export all incidents with severity, status, MTTA and MTTC via Microsoft Graph API\n.\\Get-SentinelIncidentReport.ps1 -WorkspaceName \"sentinal\" -Days 30\n\n# Retrieve all Defender XDR alerts with investigation state and resolution\n.\\Get-DefenderXDRAlerts.ps1 -ProviderName \"Microsoft Defender XDR\""
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Sentinel Workspace Overview",
+      "caption": "Log Analytics workspace (sentinal) with Microsoft Sentinel enabled.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Content Hub — Defender XDR Solution",
+      "caption": "Microsoft Defender XDR solution v3.0.12 shown as Installed from Content Hub.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Data Connectors Status",
+      "caption": "Defender XDR, Defender for Identity and Defender for Office 365 connector status.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "Analytics Rules",
+      "caption": "Built-in Defender XDR analytics rules and custom KQL detection rule shown as Active.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "Sentinel Incidents Overview",
+      "caption": "Overview blade showing 1 total incident, 0 active, 1 closed, over the last 24 hours.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "Incident Detail — Auto-Closed",
+      "caption": "Closed incident detail showing Low severity, MTTA 0 min, MTTC 14 min, and 0 analyst interventions.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "Cross-Project Alert Evidence",
+      "caption": "Email reported by user as malware or phish alert, Investigation state: No threats found.",
+      "phase": "Phase 5"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Workspace & Sentinel Enabled",
+      "detail": "Log Analytics workspace (sentinal) created and Microsoft Sentinel enabled successfully."
+    },
+    {
+      "item": "Connector Installed",
+      "detail": "Defender XDR solution v3.0.12 installed from Content Hub and connected — no agents or keys required."
+    },
+    {
+      "item": "Data Ingestion Confirmed",
+      "detail": "SecurityIncident and SecurityAlert KQL queries return Defender XDR data."
+    },
+    {
+      "item": "Analytics Rules Active",
+      "detail": "Built-in rules enabled plus one custom KQL detection rule for incident count by severity."
+    },
+    {
+      "item": "Incident Auto-Closed",
+      "detail": "1 incident (Low severity) auto-investigated and closed with MTTA 0 min and MTTC 14 min."
+    },
+    {
+      "item": "Cross-Project Traceability",
+      "detail": "MDO 'reported phish' alert traced back to the Attack Simulation Training project, confirming end-to-end signal flow."
+    },
+    {
+      "item": "Zero Analyst Interventions",
+      "detail": "0 manual remediation actions were required across the validated lab period."
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Permanent workspace naming",
+      "detail": "The Log Analytics workspace name (sentinal) cannot be renamed after creation, so naming had to be validated carefully before enabling Sentinel."
+    },
+    {
+      "title": "Content Hub install order",
+      "detail": "The Defender XDR solution must be installed from Content Hub before it can be activated in Data Connectors — attempting the reverse order does not work."
+    }
+  ],
+  "lessons": [
+    "Workspace naming is permanent — always validate spelling before enabling Sentinel on a Log Analytics workspace.",
+    "Content Hub vs Data Connectors — install the solution from Content Hub first, then activate the connector; the reverse order fails.",
+    "A 0-minute MTTA is a success metric, not a data gap — it should be communicated as evidence of automation maturity.",
+    "An empty incidents list over 30 days is a valid lab outcome — document it explicitly so it doesn't read as an unconfigured environment.",
+    "Cross-project signal traceability (an alert from one project surfacing as a Sentinel incident from another) is a strong portfolio differentiator."
+  ],
+  "businessImpact": [
+    {
+      "label": "Mean Time to Acknowledge",
+      "value": "0 min",
+      "icon": "clock"
+    },
+    {
+      "label": "Mean Time to Close",
+      "value": "14 min",
+      "icon": "clock"
+    },
+    {
+      "label": "Analyst Interventions",
+      "value": "0",
+      "icon": "efficiency"
+    },
+    {
+      "label": "Incidents Auto-Closed",
+      "value": "1 / 1 (100%)",
+      "icon": "shield"
+    }
+  ],
+  "skills": [
+    "Microsoft Sentinel workspace deployment and configuration",
+    "Microsoft Defender XDR connector integration",
+    "KQL query authoring for security incident and alert analysis",
+    "SIEM analytics rule creation and tuning",
+    "SOC governance metrics (MTTA/MTTC) reporting",
+    "Cross-pillar Zero Trust signal correlation"
+  ],
+  "relatedCertifications": [
+    "SC-200",
+    "SC-100",
+    "SC-300"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "lokeshm-it/Defender-XDR-Microsoft-Sentinel",
+    "description": "Native Microsoft Defender XDR integration with Microsoft Sentinel — unified SIEM ingestion, analytics rules and automation-first incident response.",
+    "url": "https://github.com/lokeshm-it/Defender-XDR-Microsoft-Sentinel"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -2720,6 +3018,7 @@ export const caseStudies: CaseStudy[] = [
   zeroTrustIdentity,
   purviewDsi,
   purviewCommComp,
+  defenderXdrSentinel,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
