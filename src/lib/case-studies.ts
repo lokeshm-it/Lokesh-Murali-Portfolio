@@ -3861,6 +3861,315 @@ const informationBarriers: CaseStudy = {
   downloads: standardDownloads,
 };
 
+const insiderRiskManagement: CaseStudy = {
+  "slug": "insider-risk-management",
+  "title": "Microsoft Purview Insider Risk Management",
+  "tagline": "Tenant-wide Data Leaks policy detecting authorized-insider data exfiltration through behavioral analytics and sequence detection",
+  "category": "Compliance · Insider Risk",
+  "hero": false,
+  "outcome": "Deployed a tenant-wide Data Leaks Insider Risk Management policy that reached Healthy status, with activity scoring validated end-to-end against a real test user",
+  "badges": [
+    "Microsoft Purview",
+    "Insider Risk Management",
+    "Data Loss Prevention",
+    "Zero Trust"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 tenant (securem365lsb.onmicrosoft.com)",
+  "deployment": "Home Lab",
+  "implementationTime": "4-6 hours",
+  "certifications": [
+    "SC-400",
+    "SC-300",
+    "SC-200",
+    "MS-102"
+  ],
+  "executiveSummary": [
+    "This project configures and validates Microsoft Purview Insider Risk Management with a tenant-wide Data Leaks policy, moving from an empty solution instance through analytics enablement, indicator and privacy configuration, and a fully scoped policy that reaches Healthy status with activity scoring actively initiated for a test user.",
+    "Every configuration step is backed by a screenshot captured during the lab build, with no invented configuration values, following an evidence-only documentation standard."
+  ],
+  "businessProblem": {
+    "problem": "Regulated and data-sensitive organizations need visibility into risk posed by authorized insiders — employees who already have legitimate access to sensitive data but who may exfiltrate it accidentally or intentionally, for example before resignation. Perimeter controls such as firewalls and Conditional Access do not address this risk because the actor is an authenticated, authorized user operating within their normal access boundaries.",
+    "importance": "Without a dedicated insider risk solution, low-signal individual activities such as a SharePoint download, a removed sensitivity label, or a file archived and copied to USB go undetected in isolation, even though the same activities performed in sequence are a strong indicator of intentional data exfiltration.",
+    "risks": [
+      "Undetected multi-step exfiltration sequences (download, obfuscate, exfiltrate, delete) by authorized users",
+      "Departing employees taking sensitive data before resignation",
+      "Sensitive data such as credit card information leaving the tenant through prioritized SharePoint sites",
+      "Lack of role-based visibility into insider activity due to unassigned Analyst/Investigator role groups"
+    ],
+    "compliance": [
+      "PCI-relevant data handling",
+      "Regulatory data governance obligations",
+      "Zero Trust insider threat visibility"
+    ]
+  },
+  "solutionOverview": [
+    "Enabled analytics at both tenant and user aggregation levels to build a behavioral baseline.",
+    "Configured solution-wide settings: privacy/pseudonymization, policy indicators (Office, Device, Defender for Endpoint, Risky browsing), intelligent detections, and domain lists.",
+    "Reviewed the seven built-in Insider Risk Management role groups for least-privilege administration.",
+    "Built a tenant-wide Data Leaks policy from a Microsoft Quick Policy template, with content prioritization, tenant-specific thresholds, and full sequence detection.",
+    "Submitted the policy, confirmed Healthy status, and started activity scoring for a named test user to validate the deployment end-to-end."
+  ],
+  "architectureCaption": "Insider Risk Management data flow: Office, Device, Defender for Endpoint, and Entra ID Protection signals feed analytics, which drive a scoped Data Leaks policy with sequence detection and test-user activity scoring.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Purview Insider Risk Management",
+      "description": "Core solution for behavioral analytics, indicator configuration, and policy management"
+    },
+    {
+      "name": "Microsoft 365 Unified Audit Log",
+      "description": "Source of Office and Device activity indicators"
+    },
+    {
+      "name": "Microsoft Defender for Endpoint",
+      "description": "Source of defense-evasion and unwanted-software indicators (P2 required)"
+    },
+    {
+      "name": "Microsoft Purview Data Loss Prevention",
+      "description": "Optional trigger and prerequisite for the Data Leaks policy template"
+    },
+    {
+      "name": "Microsoft Entra ID Protection",
+      "description": "Identity-risk indicators feeding into insider risk scoring"
+    },
+    {
+      "name": "Microsoft Purview Roles and Scopes",
+      "description": "RBAC role groups governing Insider Risk Management administration"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Tenant",
+      "value": "securem365lsb.onmicrosoft.com"
+    },
+    {
+      "label": "Policy Template",
+      "value": "Data Leaks (Quick Policy)"
+    },
+    {
+      "label": "Scope",
+      "value": "All users, groups, and adaptive scopes"
+    },
+    {
+      "label": "Prioritized Content",
+      "value": "Team Site (SharePoint), Credit Card Number (SIT)"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Analytics and Privacy Configuration",
+      "description": "Enabled tenant and user-level analytics to establish a behavioral baseline, and configured pseudonymized usernames for privacy-by-design alert triage.",
+      "steps": [
+        "Navigate to Insider Risk Management from the Purview Solutions menu",
+        "Review the Overview page and recommended actions",
+        "Configure Analytics settings (tenant + user level insights: On)",
+        "Configure Privacy settings (pseudonymized usernames selected)"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Policy Indicators and Intelligent Detections",
+      "description": "Enabled Office, Device, Defender for Endpoint, and Risky browsing indicators, then tuned intelligent detection thresholds and alert volume.",
+      "steps": [
+        "Enable Policy indicators — Office activities (Select all)",
+        "Enable Policy indicators — Device activities (Select all)",
+        "Enable Defender for Endpoint and Risky browsing indicators (preview)",
+        "Configure Intelligent detections — file activity threshold (50 events), Default alert volume",
+        "Configure Defender alert statuses (all 4) and Unallowed/Third-party domains (left empty)"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Role Group Review",
+      "description": "Reviewed the seven built-in Insider Risk Management role groups to plan least-privilege administration, identifying that only the base group had an assigned user.",
+      "steps": [
+        "Review Insider Risk Management role groups (7 groups)",
+        "Identify role groups lacking assigned Analysts/Investigators"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "Data Leaks Policy Creation",
+      "description": "Built a tenant-wide Data Leaks policy from Microsoft's Quick Policy template, scoped to all users, with SharePoint and Credit Card Number content prioritization.",
+      "steps": [
+        "Open Policies page and Create policy menu",
+        "Select the Data leaks Quick Policy template",
+        "Name the policy: \"Data Leaks Insider Risk Policy\"",
+        "Scope: All users, groups, and adaptive scopes",
+        "Enable content prioritization (SharePoint, labels, SITs, extensions, classifiers)",
+        "Prioritize SharePoint site: Team Site",
+        "Prioritize sensitive info type: Credit Card Number"
+      ]
+    },
+    {
+      "phase": "Phase 5",
+      "title": "Triggering Events, Sequence Detection, and Validation",
+      "description": "Configured exfiltration triggering events, applied recommended tenant-specific thresholds, enabled full sequence detection, submitted the policy, and validated activity scoring against a test user.",
+      "steps": [
+        "Configure scoring scope: Get alerts for all activity",
+        "Select triggering event: User performs an exfiltration activity (8/24 activities)",
+        "Apply built-in trigger thresholds (Recommended)",
+        "Enable full sequence detection (download/archive/label-downgrade chains)",
+        "Apply indicator thresholds specific to your users' activity (Recommended)",
+        "Final review (74/126 indicators) and Submit",
+        "Confirm policy Status: Healthy",
+        "Start activity scoring for Test User 1 (5-day scope)"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Insider Risk Role Group Verification",
+      "language": "powershell",
+      "filename": "Verify-InsiderRiskPolicy.ps1",
+      "code": "# Connect to Security & Compliance PowerShell (required for Purview role and policy verification)\nConnect-IPPSSession -UserPrincipalName admin@securem365lsb.onmicrosoft.com\n\n# Review Insider Risk Management role group membership\nGet-RoleGroupMember -Identity \"Insider Risk Management\"\nGet-RoleGroupMember -Identity \"Insider Risk Management Analysts\"\nGet-RoleGroupMember -Identity \"Insider Risk Management Investigators\""
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Analytics Settings",
+      "caption": "Tenant and user-level insights enabled to establish a behavioral baseline.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Policy Indicators — Office Activities",
+      "caption": "All Office activity indicators selected tenant-wide.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Insider Risk Role Groups",
+      "caption": "Seven built-in role groups reviewed; only the base group had an assigned user.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "Quick Policy Templates",
+      "caption": "Data leaks template selected from Microsoft's built-in Quick Policy library.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "Content Prioritization",
+      "caption": "SharePoint Team Site and Credit Card Number sensitive information type prioritized.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "Detection Options — Sequence Detection",
+      "caption": "Full multi-step sequence detection enabled for download, archive, and label-downgrade chains.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "Policy Successfully Created",
+      "caption": "Data Leaks Insider Risk Policy reaches Healthy status immediately after submission.",
+      "phase": "Phase 5"
+    },
+    {
+      "title": "Activity Scoring Started",
+      "caption": "Activity scoring started for Test User 1 with a 5-day scope to validate the deployment end-to-end.",
+      "phase": "Phase 5"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Analytics enabled (tenant + user level)",
+      "detail": "Confirmed via Purview portal settings — Pass"
+    },
+    {
+      "item": "Privacy/pseudonymization configured",
+      "detail": "Confirmed via Purview portal settings — Pass"
+    },
+    {
+      "item": "Office, Device, Defender, Risky Browsing indicators enabled",
+      "detail": "Confirmed via Purview portal settings — Pass"
+    },
+    {
+      "item": "Role groups reviewed",
+      "detail": "Partial — specialized groups have 0 assigned users"
+    },
+    {
+      "item": "Policy created from Data Leaks template",
+      "detail": "Confirmed via policy wizard — Pass"
+    },
+    {
+      "item": "Content prioritization configured",
+      "detail": "Confirmed via policy wizard — Pass"
+    },
+    {
+      "item": "Triggering event and thresholds configured",
+      "detail": "Confirmed via policy wizard — Pass"
+    },
+    {
+      "item": "Sequence detection configured",
+      "detail": "Confirmed via policy wizard — Pass"
+    },
+    {
+      "item": "Policy submitted and reaches Healthy status",
+      "detail": "Confirmed in Policies list — Pass"
+    },
+    {
+      "item": "Activity scoring started for test user",
+      "detail": "Confirmed via Policies action — Pass"
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Missing role-group alert-view permission",
+      "detail": "The signed-in session lacked a role group with alert-viewing permission, surfaced directly by a banner on the Policies page; documented as a known limitation rather than resolved in place."
+    },
+    {
+      "title": "Unconfigured optional connectors",
+      "detail": "Cloud Apps, Cloud Storage, Microsoft Fabric, and Network indicator categories remained at 0 selected because their underlying connectors were not configured in this lab."
+    }
+  ],
+  "lessons": [
+    "Enabling an indicator at the solution-settings level does not guarantee it is available at the policy level — indicator availability can still be individually gated during policy creation.",
+    "A \"Healthy\" policy status is a structural validation, not proof of active alerting; explicit test-user scoring is a necessary additional step.",
+    "Several of the richest indicator categories depend entirely on optional connector prerequisites (Defender for Cloud Apps, Microsoft Fabric, physical badging) that are easy to overlook when following the Quick Policy path."
+  ],
+  "businessImpact": [
+    {
+      "label": "Policy Status",
+      "value": "Healthy",
+      "icon": "shield"
+    },
+    {
+      "label": "Indicators Reviewed",
+      "value": "126",
+      "icon": "compliance"
+    },
+    {
+      "label": "Detection Model",
+      "value": "Sequence-Based",
+      "icon": "risk"
+    },
+    {
+      "label": "Validation",
+      "value": "Test-User Verified",
+      "icon": "activity"
+    }
+  ],
+  "skills": [
+    "Microsoft Purview Insider Risk Management",
+    "Risk Indicator & Threshold Design",
+    "RBAC Role Group Review",
+    "Policy Lifecycle Management",
+    "Evidence-Based Technical Documentation"
+  ],
+  "relatedCertifications": [
+    "SC-400",
+    "SC-300",
+    "SC-200",
+    "MS-102"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "Microsoft-Insider-Risk-Management",
+    "description": "Enterprise implementation of Microsoft Purview Insider Risk Management with a tenant-wide Data Leaks policy",
+    "url": "https://github.com/lokeshm-it/Microsoft-Insider-Risk-Management"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -3881,6 +4190,7 @@ export const caseStudies: CaseStudy[] = [
   continuousTvm,
   zeroTrustEmailSecurity,
   informationBarriers,
+  insiderRiskManagement,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
