@@ -4599,6 +4599,166 @@ const dspmForAi: CaseStudy = {
   downloads: standardDownloads,
 };
 
+
+/* 20. Microsoft Purview Compliance Manager */
+const purviewComplianceManager: CaseStudy = {
+  slug: "purview-compliance-manager",
+  title: "Microsoft Purview Compliance Manager",
+  tagline:
+    "Operationalising a risk-based compliance program — assessments, a 500-item improvement action backlog and a full ISO/IEC 27001:2013 control mapping across a Microsoft 365 tenant.",
+  category: "Compliance · Governance & Risk",
+  hero: false,
+  outcome:
+    "Stood up a measurable compliance program from a 59% baseline score — prioritised a 500-item improvement action backlog by risk impact and mapped a full ISO/IEC 27001:2013 control set for audit readiness.",
+  badges: ["Microsoft Purview", "Compliance Manager", "ISO/IEC 27001", "Regulatory Compliance", "Data Protection Baseline", "AI Baseline"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "60–90 minutes",
+  certifications: ["SC-400", "SC-900"],
+  executiveSummary: [
+    "This project documents an end-to-end configuration of Microsoft Purview Compliance Manager, the risk-based compliance scoring and workflow engine embedded in the Microsoft Purview compliance portal, operated against a tenant with an active compliance program already in flight.",
+    "The lab starts from a 59% compliance score (13,354.39 of 22,416 points), works two active assessments — AI Baseline and Data Protection Baseline for Microsoft 365 — prioritises a 500-item improvement action backlog by risk impact, reviews a 391-item regulation catalog, and maps the full ISO/IEC 27001:2013 control set (233 controls, 347 Microsoft actions) for certification readiness.",
+  ],
+  businessProblem: {
+    problem:
+      "The organisation needed a single system of record for compliance posture instead of tracking hundreds of controls across spreadsheets, SharePoint sites and email threads, which does not scale and produces inconsistent evidence when auditors ask \"prove it\".",
+    importance:
+      "Manual control tracking cannot keep pace with simultaneous regulatory pressure — data protection laws, industry-specific standards, national frameworks and voluntary certifications such as ISO/IEC 27001 — while a 500-item improvement action backlog needs risk-based prioritisation, not alphabetical processing.",
+    risks: [
+      "500 open improvement actions, many showing a Failed – High Risk test status, with no structured prioritisation",
+      "Inability to demonstrate shared-responsibility coverage between Microsoft-managed and customer-managed controls",
+      "Unpreparedness for an ISO/IEC 27001:2013 certification or surveillance audit across 233 applicable controls",
+    ],
+    compliance: [
+      "Data Protection Baseline and AI Baseline assessments for Microsoft 365",
+      "ISO/IEC 27001:2013 Annex A control mapping toward ISMS certification readiness",
+    ],
+  },
+  solutionOverview: [
+    "Compliance Manager was reviewed from the Overview dashboard to confirm the starting 59% compliance score, split between 946.39 of 9,915 customer-managed points and 12,408 of 12,501 Microsoft-managed points, before drilling into the two active assessments.",
+    "The 500-item improvement action register was filtered to Test status: Failed - High Risk and sequenced by identity and access controls first, then device compliance, then data protection, while the Regulations catalog (391 templates) and the ISO/IEC 27001:2013 control mapping (233 controls, 347 Microsoft actions) were reviewed to plan certification-readiness work and export audit-ready reports.",
+  ],
+  architectureCaption:
+    "Signal from Microsoft 365 workloads, Microsoft Entra ID, Microsoft Intune and Microsoft Defender feeds Compliance Manager, which scores Microsoft-managed and customer-managed controls across active assessments and produces exportable compliance reports.",
+  technologyStack: [
+    { name: "Microsoft Purview Compliance Manager", description: "Risk-based compliance scoring and workflow engine in the Purview compliance portal" },
+    { name: "Assessments", description: "Data Protection Baseline for Microsoft 365 and AI Baseline, tracked at 61% and 64% progress" },
+    { name: "Improvement Actions register", description: "500-item filterable compliance backlog spanning technical and operational controls" },
+    { name: "Regulations catalog", description: "391 regulatory and industry templates spanning data protection, AI governance and premium frameworks" },
+    { name: "ISO/IEC 27001:2013 mapping", description: "233 Annex A controls and 347 Microsoft/Azure Control Framework actions" },
+  ],
+  labEnvironment: [
+    { label: "Portal", value: "Microsoft Purview compliance portal (compliance.microsoft.com)" },
+    { label: "Starting compliance score", value: "59% (13,354.39 of 22,416 points)" },
+    { label: "Active assessments", value: "AI Baseline (64%), Data Protection Baseline for Microsoft 365 (61%)" },
+    { label: "Improvement actions tracked", value: "500 (37 completed, 0 out of scope)" },
+    { label: "Regulations catalog reviewed", value: "391 templates, 3 of 3 purchased licenses available" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Review Overview and Baseline Compliance Score",
+      description:
+        "Sign in to the Microsoft Purview compliance portal and review the Overview dashboard to confirm the starting compliance score and Microsoft-managed versus customer-managed point split.",
+      steps: [
+        "Sign in with an account holding the Compliance Manager Administrator role",
+        "Review the Overall compliance score gauge and the points-achieved breakdown",
+        "Review the Key improvement actions table for the highest-impact unresolved items",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Review Active Assessments",
+      description:
+        "Drill into the Data Protection Baseline for Microsoft 365 and AI Baseline assessments to review scoped progress against each regulation template.",
+      steps: [
+        "Open Assessments and review progress for Data Protection Baseline (61%) and AI Baseline (64%)",
+        "Review the Progress, Controls, Your improvement actions and Microsoft actions tabs",
+        "Cross-reference key improvement actions against their test status",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Prioritise the Improvement Actions Backlog",
+      description:
+        "Filter the 500-item improvement action register by test status and point value to build a risk-ordered remediation plan.",
+      steps: [
+        "Filter improvement actions to Test status: Failed - High Risk",
+        "Sort by point value and sequence identity, then device, then data protection controls",
+        "Assign owners and implementation status, attaching evidence where available",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Map ISO/IEC 27001:2013 Controls and Export Reports",
+      description:
+        "Review the Regulations catalog and the ISO/IEC 27001:2013 control and Microsoft action mapping, then export assessment reports as audit evidence.",
+      steps: [
+        "Browse the 391-item Regulations catalog grouped by template category",
+        "Review ISO/IEC 27001:2013 All controls (233 items) and Microsoft actions (347 items)",
+        "Download an assessment report and store it as date-stamped audit evidence",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Illustrative Compliance Manager export scaffold",
+      language: "powershell",
+      filename: "Export-ComplianceManagerActions.ps1",
+      code: "# Illustrative scaffold - this lab was performed entirely through the Purview compliance portal UI.\nConnect-IPPSSession -UserPrincipalName admin@yourtenant.onmicrosoft.com\n\n# Illustrates how improvement action export could be automated via the Microsoft Graph Compliance Manager APIs\nGet-ComplianceManagerAssessment | Select-Object AssessmentName, Progress, PointsAchieved",
+    },
+  ],
+  screenshots: placeholderScreenshots([
+    ["Compliance Manager Overview", "The Overview dashboard showing a 59% compliance score across Microsoft-managed and customer-managed points."],
+    ["Assessments List", "AI Baseline and Data Protection Baseline for Microsoft 365 assessments in progress at 64% and 61%."],
+    ["Data Protection Baseline Assessment Detail", "Scoped progress, controls and improvement actions for the Data Protection Baseline assessment."],
+    ["Improvement Actions List", "The 500-item improvement action register filterable by test status, point value and category."],
+    ["Device Compliance Reporting", "The Generate and review reports for device compliance improvement action with a Launch Now deep link into Intune."],
+    ["Regulations Catalog", "The 391-item Regulations catalog grouped by Sub-Service Compliance Readiness, Included, Premium AI and Premium templates."],
+    ["ISO/IEC 27001:2013 All Controls", "233 Annex A controls grouped by control family for ISMS certification readiness."],
+    ["ISO/IEC 27001:2013 Microsoft Actions", "347 Microsoft/Azure Control Framework actions satisfying ISO/IEC 27001:2013 requirements."],
+  ]),
+  validation: [
+    { item: "Baseline compliance score confirmed", detail: "Overview dashboard verified 59% overall - 13,354.39 of 22,416 points achieved - Pass" },
+    { item: "Active assessments reviewed", detail: "AI Baseline at 64% (2 of 80 actions) and Data Protection Baseline at 61% (36 of 489 actions) - Pass" },
+    { item: "Improvement actions backlog triaged", detail: "500 improvement actions reviewed and filtered by Test status: Failed - High Risk - Pass" },
+    { item: "ISO/IEC 27001:2013 mapping reviewed", detail: "233 Annex A controls and 347 Microsoft actions confirmed under the regulation entry - Pass" },
+  ],
+  challenges: [
+    { title: "Score is point-weighted, not count-weighted", detail: "Assessment progress percentages did not track linearly with completed action counts, since a few high-point actions outweigh many low-point actions - required prioritising by point value rather than backlog size." },
+    { title: "500-item backlog risked appearing unmanageable", detail: "Segmenting improvement actions by test status and point value converted an unstructured 500-item list into an ordered, workable remediation sprint plan." },
+  ],
+  lessons: [
+    "The compliance score is a communication tool, not the goal - chasing the percentage without validating genuine control implementation risks an audit that fails despite a high displayed score.",
+    "Customer-managed points are where the real remediation work is - Microsoft-managed points arrive largely through the shared-responsibility model.",
+    "ISO/IEC 27001 pre-built Azure Control Framework mapping (347 actions, 233 controls) is a substantial accelerator for certification readiness compared with manual cross-referencing.",
+    "Evidence staleness is a silent risk - a Passed test status from months ago, without recurring verification, is a weaker audit position than an honest Not Assessed with a scheduled test date.",
+  ],
+  businessImpact: [
+    { label: "Baseline Compliance Score", value: "59%", icon: "compliance" },
+    { label: "Improvement Actions Tracked", value: "500", icon: "risk" },
+    { label: "Regulatory Templates Reviewed", value: "391", icon: "activity" },
+    { label: "ISO/IEC 27001 Controls Mapped", value: "233", icon: "shield" },
+  ],
+  skills: [
+    "Microsoft Purview Compliance Manager Configuration",
+    "Compliance Assessment Management (Data Protection Baseline, AI Baseline)",
+    "Improvement Action Prioritisation and Remediation Tracking",
+    "Regulatory Framework and Regulations Catalog Review",
+    "ISO/IEC 27001:2013 Control Mapping",
+    "Compliance Reporting and Audit Evidence Preparation",
+  ],
+  relatedCertifications: ["SC-400", "SC-900"],
+  blogArticles: [],
+  repo: {
+    name: "Microsoft-Purview-Compliance-Manager",
+    description: "Enterprise implementation of Microsoft Purview Compliance Manager - compliance assessments, improvement action remediation and ISO/IEC 27001:2013 control mapping.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-Compliance-Manager",
+  },
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -4622,6 +4782,7 @@ export const caseStudies: CaseStudy[] = [
   insiderRiskManagement,
   adaptiveProtection,
   dspmForAi,
+  purviewComplianceManager,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
