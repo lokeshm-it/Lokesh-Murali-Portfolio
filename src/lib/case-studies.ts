@@ -4170,6 +4170,272 @@ const insiderRiskManagement: CaseStudy = {
   downloads: standardDownloads,
 };
 
+const adaptiveProtection: CaseStudy = {
+  "slug": "adaptive-protection",
+  "title": "Microsoft Purview Adaptive Protection",
+  "tagline": "Dynamic Data Loss Prevention and Conditional Access enforcement driven by Insider Risk Management risk levels",
+  "category": "Compliance · Insider Risk",
+  "hero": false,
+  "outcome": "Recovered Adaptive Protection from a disabled outage state, re-enabled it tenant-wide, and verified healthy, enforced linkage between insider risk levels and both DLP and Conditional Access policies",
+  "badges": [
+    "Microsoft Purview",
+    "Adaptive Protection",
+    "Insider Risk Management",
+    "Conditional Access",
+    "Zero Trust"
+  ],
+  "difficulty": "Advanced",
+  "environment": "Microsoft 365 tenant (Microsoft Purview compliance portal)",
+  "deployment": "Home Lab",
+  "implementationTime": "3-5 hours",
+  "certifications": [
+    "SC-400",
+    "SC-300",
+    "SC-200"
+  ],
+  "executiveSummary": [
+    "This project documents the configuration and verification of Microsoft Purview Adaptive Protection, which connects Insider Risk Management risk levels to Data Loss Prevention and Conditional Access enforcement, allowing those policies to automatically tighten controls against specific high-risk users without manual scope changes.",
+    "The lab began from a real, observed outage state — Adaptive Protection disabled because its source insider risk policy had been deleted — and walks through diagnosis, recovery, risk-level configuration, and PowerShell-based health verification."
+  ],
+  "businessProblem": {
+    "problem": "Static DLP and Conditional Access policies apply the same controls to every user regardless of their actual behavioral risk, meaning either all users are subject to strict friction-heavy controls, or high-risk users are not treated any differently from low-risk ones. Organizations need enforcement that automatically escalates for specific users identified as elevated risk, without administrators manually re-scoping policies.",
+    "importance": "Without Adaptive Protection, insider risk signals computed by Insider Risk Management have no automated path into enforcement — an elevated-risk user continues operating under the same DLP and Conditional Access controls as every other user until a human intervenes.",
+    "risks": [
+      "Adaptive Protection silently disabled if its source insider risk policy is deleted, with no automatic remediation",
+      "Elevated-risk users retaining full access under Conditional Access until manually restricted",
+      "DLP policies not tightening automatically for users already flagged as high risk",
+      "Report-only Conditional Access policies providing no real enforcement if never promoted to enforced"
+    ],
+    "compliance": [
+      "Zero Trust adaptive access control",
+      "Insider threat risk-based enforcement",
+      "Regulatory data protection obligations"
+    ]
+  },
+  "solutionOverview": [
+    "Identified and diagnosed the initial Adaptive Protection outage state, caused by the deletion of its source Insider Risk Management policy.",
+    "Re-enabled Adaptive Protection at the tenant level from the Adaptive Protection settings page.",
+    "Configured Elevated, Moderate, and Minor insider risk level thresholds sourced from the Data Leaks Insider Risk Policy.",
+    "Reviewed the Conditional Access policy (Block access to Office Apps for users with Insider Risk, Report-only, Elevated) that consumes Adaptive Protection risk levels.",
+    "Reviewed the two Data Loss Prevention policies (Teams/Exchange and Endpoint) that consume Adaptive Protection risk levels.",
+    "Verified the Adaptive Protection policy and all related Insider Risk Management policies using Security & Compliance PowerShell."
+  ],
+  "architectureCaption": "Adaptive Protection sits between Insider Risk Management, which computes a per-user risk level, and two enforcement surfaces — Microsoft Purview DLP and Microsoft Entra Conditional Access — both of which reference the insider risk level as a condition rather than duplicating risk logic themselves.",
+  "technologyStack": [
+    {
+      "name": "Microsoft Purview Adaptive Protection",
+      "description": "Connects computed insider risk levels to downstream DLP and Conditional Access enforcement"
+    },
+    {
+      "name": "Microsoft Purview Insider Risk Management",
+      "description": "Source of Elevated, Moderate, and Minor risk level classifications"
+    },
+    {
+      "name": "Microsoft Purview Data Loss Prevention",
+      "description": "Teams/Exchange and Endpoint DLP policies that tighten automatically for elevated-risk users"
+    },
+    {
+      "name": "Microsoft Entra Conditional Access",
+      "description": "Report-only policy blocking Office Apps access for users flagged at Elevated insider risk"
+    },
+    {
+      "name": "Security & Compliance PowerShell",
+      "description": "Used to verify policy health, mode, and enabled state for Adaptive Protection and Insider Risk Management"
+    }
+  ],
+  "labEnvironment": [
+    {
+      "label": "Source Insider Risk Policy",
+      "value": "Data Leaks Insider Risk Policy"
+    },
+    {
+      "label": "Adaptive Protection Policy",
+      "value": "Adaptive Protection policy for Insider Risk Management (system-generated)"
+    },
+    {
+      "label": "Conditional Access Policy",
+      "value": "Block access to Office Apps for users with Insider Risk (Preview) — Report-only, Elevated"
+    },
+    {
+      "label": "DLP Policies",
+      "value": "Adaptive Protection policy for Teams and Exchange DLP; Adaptive Protection policy for Endpoint DLP"
+    }
+  ],
+  "implementation": [
+    {
+      "phase": "Phase 1",
+      "title": "Outage Diagnosis and Recovery",
+      "description": "Identified that Adaptive Protection was disabled because its source insider risk policy had been deleted, then re-enabled the feature at the tenant level.",
+      "steps": [
+        "Review the Adaptive Protection dashboard (initial disabled state)",
+        "Diagnose the outage: source insider risk policy previously used for Adaptive Protection had been deleted",
+        "Enable Adaptive Protection in settings"
+      ]
+    },
+    {
+      "phase": "Phase 2",
+      "title": "Risk Level Configuration",
+      "description": "Configured Elevated, Moderate, and Minor insider risk level thresholds sourced from the active Data Leaks Insider Risk Policy.",
+      "steps": [
+        "Configure insider risk levels (Elevated, Moderate, Minor)",
+        "Source risk level thresholds from the Data Leaks Insider Risk Policy"
+      ]
+    },
+    {
+      "phase": "Phase 3",
+      "title": "Enforcement Policy Review",
+      "description": "Reviewed the downstream Conditional Access and DLP policies that consume Adaptive Protection insider risk levels as enforcement conditions.",
+      "steps": [
+        "Review Conditional Access policies using insider risk (Report-only, Elevated)",
+        "Review Data Loss Prevention policies using insider risk (Teams/Exchange, Endpoint)"
+      ]
+    },
+    {
+      "phase": "Phase 4",
+      "title": "PowerShell Health Verification",
+      "description": "Verified the Adaptive Protection policy and all related Insider Risk Management policies were enabled and healthy using Security & Compliance PowerShell.",
+      "steps": [
+        "Verify the Adaptive Protection policy using PowerShell (Enabled: True, HealthStatus: Healthy)",
+        "Verify all Insider Risk Management policies using PowerShell (Mode: Enable, Enabled: True)"
+      ]
+    }
+  ],
+  "powershell": [
+    {
+      "title": "Adaptive Protection and Insider Risk Policy Verification",
+      "language": "powershell",
+      "filename": "Verify-AdaptiveProtection.ps1",
+      "code": "# Confirm the Adaptive Protection policy is enabled and healthy\nGet-InsiderRiskPolicy | Where-Object {$_.Name -like \"*Adaptive*\"} | fl Name,Enabled,PolicyHealth\n\n# Confirm the mode, state, and enabled status of every Insider Risk Management policy\nGet-InsiderRiskPolicy | fl Name,Mode,State,Enabled"
+    }
+  ],
+  "screenshots": [
+    {
+      "title": "Adaptive Protection Dashboard (Initial Disabled State)",
+      "caption": "The lab's real starting point: Adaptive Protection disabled after its source insider risk policy was deleted.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Adaptive Protection Settings",
+      "caption": "Adaptive Protection re-enabled at the tenant level.",
+      "phase": "Phase 1"
+    },
+    {
+      "title": "Insider Risk Levels",
+      "caption": "Elevated, Moderate, and Minor risk level thresholds configured from the Data Leaks Insider Risk Policy.",
+      "phase": "Phase 2"
+    },
+    {
+      "title": "Conditional Access Policies Using Insider Risk",
+      "caption": "Report-only Conditional Access policy blocking Office Apps access for Elevated-risk users.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "DLP Policies Using Insider Risk",
+      "caption": "Teams/Exchange and Endpoint DLP policies referencing Adaptive Protection insider risk levels.",
+      "phase": "Phase 3"
+    },
+    {
+      "title": "PowerShell Verification — Adaptive Protection Policy",
+      "caption": "Get-InsiderRiskPolicy confirms the Adaptive Protection policy is Enabled: True with HealthStatus: Healthy.",
+      "phase": "Phase 4"
+    },
+    {
+      "title": "PowerShell Verification — Insider Risk Policies",
+      "caption": "All related Insider Risk Management policies confirmed Mode: Enable, Enabled: True.",
+      "phase": "Phase 4"
+    }
+  ],
+  "validation": [
+    {
+      "item": "Adaptive Protection outage diagnosed",
+      "detail": "Confirmed via dashboard — disabled state traced to deleted source insider risk policy — Pass"
+    },
+    {
+      "item": "Adaptive Protection re-enabled",
+      "detail": "Confirmed via settings page — Pass"
+    },
+    {
+      "item": "Insider risk levels configured",
+      "detail": "Elevated, Moderate, Minor thresholds confirmed — Pass"
+    },
+    {
+      "item": "Conditional Access policy reviewed",
+      "detail": "Confirmed Report-only, Elevated scope — Pass"
+    },
+    {
+      "item": "DLP policies reviewed",
+      "detail": "Two policies (Teams/Exchange, Endpoint) confirmed referencing insider risk — Pass"
+    },
+    {
+      "item": "Adaptive Protection policy health verified via PowerShell",
+      "detail": "Enabled: True, HealthStatus: Healthy — Pass"
+    },
+    {
+      "item": "Insider Risk Management policies verified via PowerShell",
+      "detail": "Mode: Enable, Enabled: True for all related policies — Pass"
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Real outage from a deleted source policy",
+      "detail": "Adaptive Protection was found disabled at the start of the lab because the insider risk policy it originally sourced risk levels from had been deleted — documented as the genuine starting state rather than a simulated failure."
+    },
+    {
+      "title": "Report-only Conditional Access provides no real enforcement",
+      "detail": "The Conditional Access policy consuming insider risk levels remains in Report-only mode, meaning it currently only logs matching sign-ins rather than actually blocking access."
+    }
+  ],
+  "lessons": [
+    "Adaptive Protection has a hard dependency on its source Insider Risk Management policy — deleting that policy silently disables downstream enforcement rather than failing loudly.",
+    "PowerShell verification can reveal system-generated policies (such as IRM_Tenant_Setting_...) that are not otherwise surfaced in the Purview portal UI.",
+    "Deploying new Conditional Access policies in Report-only mode first, as observed in this lab, is a safer rollout pattern than enforcing immediately.",
+    "Turning off Adaptive Protection can take up to 6 hours to fully stop assigning and resetting risk levels, which has real operational implications for lab teardown or emergency rollback."
+  ],
+  "businessImpact": [
+    {
+      "label": "Policy Health",
+      "value": "Healthy",
+      "icon": "shield"
+    },
+    {
+      "label": "Risk Levels",
+      "value": "3-Tier (Elevated/Moderate/Minor)",
+      "icon": "risk"
+    },
+    {
+      "label": "Enforcement Surfaces",
+      "value": "DLP + Conditional Access",
+      "icon": "zerotrust"
+    },
+    {
+      "label": "Verification",
+      "value": "PowerShell-Validated",
+      "icon": "compliance"
+    }
+  ],
+  "skills": [
+    "Microsoft Purview Adaptive Protection",
+    "Insider Risk Management Policy Configuration",
+    "Conditional Access Policy Review",
+    "DLP Policy Review",
+    "PowerShell-Based Compliance Verification",
+    "Outage Diagnosis & Recovery"
+  ],
+  "relatedCertifications": [
+    "SC-400",
+    "SC-300",
+    "SC-200"
+  ],
+  "blogArticles": [],
+  "repo": {
+    "name": "Microsoft-Adaptive-Protection",
+    "description": "Configuration and verification of Microsoft Purview Adaptive Protection linking Insider Risk Management to DLP and Conditional Access enforcement",
+    "url": "https://github.com/lokeshm-it/Microsoft-Adaptive-Protection"
+  }
+,
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -4191,6 +4457,7 @@ export const caseStudies: CaseStudy[] = [
   zeroTrustEmailSecurity,
   informationBarriers,
   insiderRiskManagement,
+  adaptiveProtection,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
