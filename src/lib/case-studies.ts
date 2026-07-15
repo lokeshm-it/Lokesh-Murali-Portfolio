@@ -4436,6 +4436,169 @@ const adaptiveProtection: CaseStudy = {
   downloads: standardDownloads,
 };
 
+/* ------------------------------------------------------------------ */
+/* 19. Microsoft Purview DSPM for AI (Classic) */
+/* ------------------------------------------------------------------ */
+
+const dspmForAi: CaseStudy = {
+  slug: "dspm-for-ai",
+  title: "Microsoft Purview DSPM for AI (Classic)",
+  tagline:
+    "Discovering, auditing and governing Microsoft 365 Copilot and generative AI activity, with auto-provisioned Data Loss Prevention and Insider Risk Management policies.",
+  category: "Compliance · AI Governance",
+  hero: false,
+  outcome:
+    "Closed the Microsoft 365 Copilot visibility gap — validated live AI interaction telemetry and stood up three auto-provisioned governance policies spanning Data Loss Prevention and Insider Risk Management.",
+  badges: ["Microsoft Purview", "DSPM for AI", "Microsoft 365 Copilot", "Purview Audit", "Data Loss Prevention", "Insider Risk Management"],
+  difficulty: "Advanced",
+  environment: "Microsoft 365 / Purview",
+  deployment: "Production",
+  implementationTime: "45–60 minutes",
+  certifications: ["SC-400", "SC-300", "SC-900"],
+  executiveSummary: [
+    "This project documents an end-to-end configuration of Microsoft Purview Data Security Posture Management (DSPM) for AI (Classic) — the control plane Microsoft 365 tenants use to discover, audit and govern how users and agents interact with Microsoft 365 Copilot and other generative AI applications.",
+    "The lab completes the mandatory onboarding checklist, validates live AI interaction and sensitive-information-type telemetry in Activity Explorer, reviews risk-focused Reports, and confirms the Data Loss Prevention and Insider Risk Management policies that extending AI data discovery insights auto-provisions, closing with a governance maturity scorecard from Purview’s Recommendations engine.",
+  ],
+  businessProblem: {
+    problem:
+      "The organization had no way to see what sensitive data — PII, financial data, national identifiers — was being shared with Microsoft 365 Copilot, Copilot agents, or external generative AI applications accessed through the browser.",
+    importance:
+      "Microsoft 365 Copilot and browser-based AI tools sit directly on top of the same SharePoint, Exchange and Teams content stores that traditional DLP programs were built to protect, and prompts submitted to those tools cannot be retrieved once sent — a governance blind spot that grows with every stage of Copilot adoption.",
+    risks: [
+      "Sensitive identifiers (Aadhaar numbers, Japanese My Number data and other regulated PII) shared with Copilot without any monitoring",
+      "No structured signal for unauthorized or unethical AI interactions",
+      "Governance and audit gaps as Copilot usage scales across the tenant",
+    ],
+    compliance: [
+      "SC-400 / SC-300 aligned data security and insider risk scenarios",
+      "Zero Trust audit-first governance posture",
+    ],
+  },
+  solutionOverview: [
+    "DSPM for AI (Classic) was activated from the Purview Solutions catalog and the four-step onboarding checklist was completed in sequence — activating Microsoft Purview Audit, installing the Purview browser extension, onboarding devices, and extending insights for data discovery.",
+    "Extending insights auto-provisioned three governance policies across Data Loss Prevention and Insider Risk Management in a single action, while Activity Explorer and the Reports dashboard gave a unified view of Copilot interactions, sensitive information type matches and a dedicated \"unethical AI interaction\" risk signal.",
+  ],
+  architectureCaption:
+    "Users interacting with Microsoft 365 Copilot and browser-based AI tools feed Purview Audit telemetry into DSPM for AI, which aggregates activity into Activity Explorer and Reports and auto-provisions enforcement policies in Data Loss Prevention and Insider Risk Management.",
+  technologyStack: [
+    { name: "Microsoft Purview DSPM for AI (Classic)", description: "Discovery, telemetry and governance control plane for AI activity" },
+    { name: "Microsoft Purview Audit", description: "Foundational telemetry layer feeding Copilot interaction data" },
+    { name: "Purview browser extension & device onboarding", description: "Extends visibility to AI sites reached through Edge, Chrome and Firefox" },
+    { name: "Activity Explorer", description: "Event-level detail on AI interactions and sensitive info type matches" },
+    { name: "Data Loss Prevention / Insider Risk Management", description: "Auto-provisioned enforcement policies triggered by extending AI insights" },
+  ],
+  labEnvironment: [
+    { label: "Portal", value: "Microsoft Purview compliance portal (purview.microsoft.com)" },
+    { label: "Tenant admin account", value: "admin365lab" },
+    { label: "Test user", value: "testuser1@securem365lsb..." },
+    { label: "AI app in scope", value: "Microsoft 365 Copilot (Copilot Chat, WebChat surface)" },
+    { label: "Lab date range observed", value: "30 June 2026 – 7 July 2026" },
+  ],
+  implementation: [
+    {
+      phase: "Phase 1",
+      title: "Locate DSPM for AI and Review Onboarding",
+      description:
+        "Locate DSPM for AI (Classic) in the Purview Solutions catalog and review the four-step \"Get started\" onboarding checklist.",
+      steps: [
+        "Select DSPM for AI (classic) from the Purview Solutions catalog",
+        "Review the Overview dashboard and the four required onboarding steps",
+        "Confirm Purview Audit, the browser extension and device onboarding show completed",
+      ],
+    },
+    {
+      phase: "Phase 2",
+      title: "Extend Insights for Data Discovery",
+      description:
+        "Complete the fourth onboarding step, which auto-provisions governance policies across Data Loss Prevention and Insider Risk Management.",
+      steps: [
+        "Action \"Extend your insights for data discovery\"",
+        "Confirm the Extend Insights panel shows policies created",
+        "Review the three new policies in the consolidated Policies list",
+      ],
+    },
+    {
+      phase: "Phase 3",
+      title: "Validate Telemetry in Activity Explorer and Reports",
+      description:
+        "Confirm real AI interaction and sensitive-information-type events are populating, and review risk-focused Reports.",
+      steps: [
+        "Review AI Interaction and Sensitive info types events in Activity Explorer",
+        "Review the Reports Data section — sensitive interactions per AI app and top unethical AI interactions",
+        "Review the Reports Activity section — total interactions over time",
+      ],
+    },
+    {
+      phase: "Phase 4",
+      title: "Review Policies and Recommendations",
+      description:
+        "Confirm policy status across the consolidated Policies list and track AI governance maturity via Recommendations.",
+      steps: [
+        "Confirm all DSPM for AI-provisioned and pre-existing policies show Status: On",
+        "Review the Recommendations Not Started / Dismissed / Completed scorecard",
+        "Re-confirm the Recommendations scorecard at a narrower viewport as a consistency check",
+      ],
+    },
+  ],
+  powershell: [
+    {
+      title: "Confirm Microsoft Purview Audit status",
+      language: "powershell",
+      filename: "Get-PurviewAuditStatus.ps1",
+      code: "# Illustrative scaffold — DSPM for AI has a hard dependency on Purview Audit being active.\nConnect-IPPSSession -UserPrincipalName admin@yourtenant.onmicrosoft.com\n\n# Confirm unified audit logging is enabled tenant-wide\nGet-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled",
+    },
+  ],
+  screenshots: placeholderScreenshots([
+    ["Solution Navigation", "Locating DSPM for AI (classic) in the Purview Solutions catalog."],
+    ["Overview Dashboard", "The four-step \"Get started\" onboarding checklist."],
+    ["Activity Explorer", "AI Interaction and Sensitive info types events for Microsoft 365 Copilot."],
+    ["Reports — Data Section", "Sensitive interactions per AI app and top unethical AI interactions."],
+    ["Recommendations List", "The Not Started / Dismissed / Completed governance scorecard."],
+    ["Reports — Activity Trend", "Total AI interactions over time for Copilot experiences and agents."],
+    ["Extend Insights — Policies Created", "Confirmation that extending insights auto-provisioned three new policies."],
+    ["Policies Overview", "The consolidated Data Loss Prevention, DSPM for AI and Insider Risk Management policies."],
+    ["Recommendations Progress", "A narrower-viewport consistency check of the Recommendations scorecard."],
+  ]),
+  validation: [
+    { item: "Onboarding checklist completed", detail: "Purview Audit, browser extension and device onboarding confirmed complete before extending insights — Pass" },
+    { item: "Telemetry validated", detail: "Activity Explorer returned 9 events across AI Interaction and Sensitive info types activity types — Pass" },
+    { item: "Policies auto-provisioned", detail: "Extend Insights panel confirmed policies created; independently verified Status: On for all three in the Policies list — Pass" },
+    { item: "Sensitive interactions confirmed", detail: "Reports Data section showed 12 sensitive interactions and 1 unethical interaction against Microsoft 365 Copilot — Pass" },
+  ],
+  challenges: [
+    { title: "Sequenced onboarding dependency", detail: "DSPM for AI cannot surface any Copilot interaction telemetry until Purview Audit is active first — the onboarding checklist must be completed in order, not in parallel." },
+    { title: "One action, multiple solution areas", detail: "\"Extend insights for data discovery\" provisions policies across Data Loss Prevention and Insider Risk Management simultaneously, so a single DSPM for AI action has a footprint that other solution owners need to review." },
+  ],
+  lessons: [
+    "Visibility precedes governance — meaningful AI activity data only became visible after the first three onboarding steps were completed.",
+    "A single \"Extend insights for data discovery\" action provisioned policies across three different Purview solution areas at once, which matters for change management.",
+    "The Recommendations completion count is a leading indicator of governance maturity, not a lagging measure of actual protection already in place.",
+    "DSPM for AI (Classic) is scheduled for retirement on 30 September 2026, with all classic data carrying forward into the new DSPM experience — a migration every Microsoft 365 security team using it will need to plan for.",
+  ],
+  businessImpact: [
+    { label: "Sensitive Interactions Detected", value: "12", icon: "risk" },
+    { label: "Policies Auto-Provisioned", value: "3", icon: "compliance" },
+    { label: "Telemetry Validated", value: "9 Activity Events", icon: "shield" },
+    { label: "Governance Maturity", value: "1 of 14 Recommendations", icon: "activity" },
+  ],
+  skills: [
+    "Microsoft Purview DSPM for AI Configuration",
+    "Microsoft 365 Copilot Activity Monitoring",
+    "Activity Explorer & Reports Analysis",
+    "Data Loss Prevention Policy Review",
+    "Insider Risk Management Policy Review",
+    "AI Governance Maturity Tracking",
+  ],
+  relatedCertifications: ["SC-400", "SC-300", "SC-900"],
+  blogArticles: [],
+  repo: {
+    name: "Microsoft-Purview-DSPM-for-AI",
+    description: "Enterprise configuration and validation of Microsoft Purview DSPM for AI (Classic) for Microsoft 365 Copilot governance.",
+    url: "https://github.com/lokeshm-it/Microsoft-Purview-DSPM-for-AI",
+  },
+  downloads: standardDownloads,
+};
+
 /* Registry */
 /* ------------------------------------------------------------------ */
 
@@ -4458,6 +4621,7 @@ export const caseStudies: CaseStudy[] = [
   informationBarriers,
   insiderRiskManagement,
   adaptiveProtection,
+  dspmForAi,
 ];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
